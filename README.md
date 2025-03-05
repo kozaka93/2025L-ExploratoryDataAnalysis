@@ -59,7 +59,7 @@ Wstęp do eksploracji danych składa się z:
     <td>11.mar</td>
     <td>2</td>
     <td>lab</td>
-    <td>R: ggplot2 - wstęp i gramatyka</td>
+    <td><a href="https://github.com/kozaka93/2025L-ExploratoryDataAnalysis/tree/main/labs/lab03">R: ggplot2 - wstęp i gramatyka</a></td>
     <td><a href="https://github.com/kozaka93/2025L-ExploratoryDataAnalysis/issues/44">PD1</a> (6p)</td>
   </tr>
   <tr>
