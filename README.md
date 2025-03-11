@@ -73,7 +73,7 @@ Wstęp do eksploracji danych składa się z:
     <td>18.mar</td>
     <td>2</td>
     <td>lab</td>
-    <td>R: ggplot2 - modyfikacje wykresów, stylów</td>
+    <td><a href="https://github.com/kozaka93/2025L-ExploratoryDataAnalysis/tree/main/labs/lab04">R: ggplot2 - modyfikacje wykresów, stylów</a></td>
     <td></td>
   </tr>
   <tr>
