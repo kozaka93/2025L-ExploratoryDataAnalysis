@@ -14,14 +14,14 @@ df <- read.csv("data.csv")
 types <- sapply(df, class)
 print(types)
 
-# Gender - "character"
-# Age - "integer"
-# Occupation - "character"
-# Sleep.Duration - "numeric"
-# Quality.of.Sleep - "integer"
-# Physical.Activity.Level - "integer"
-# BMI.Category - "character"
-# Sleep.Disorder - "character"
+# Gender - jakościowa, binarna
+# Age - ilościowa, ilorazowa
+# Occupation - jakościowa, nominalna
+# Sleep.Duration - ilościowa, przedziałowa
+# Quality.of.Sleep - ilościowa, ilorazowa
+# Physical.Activity.Level - ilościowa, ilorazowa
+# BMI.Category - jakościowa, nominalna
+# Sleep.Disorder - jakościowa, nominalna
 
 
 ########### Zad 2 (0.5pkt) ###########
