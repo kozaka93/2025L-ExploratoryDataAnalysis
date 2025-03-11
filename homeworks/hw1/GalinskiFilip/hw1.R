@@ -13,14 +13,14 @@ df <- read.csv("data.csv")
 
 # Rozwiązanie: ------------------------------------------------------------
 
-# Gender - character
-# Age - numeric
-# Occupation - character
-# Sleep.Duration - numeric
-# Quality.of.Sleep - numeric
-# Physical.Activity.Level - numeric
-# BMI.Category - character
-# Sleep.Disorder - character
+# Gender - character, binarne
+# Age - numeric , ilościowe, ilorazowe
+# Occupation - character, jakościowe, nominalne
+# Sleep.Duration - numeric, ilościowe, ilorazowe
+# Quality.of.Sleep - numeric, jakościowe, uporządkowane
+# Physical.Activity.Level - numeric, ilościowe, ilorazowe
+# BMI.Category - character, jakościowe, uporządkowane
+# Sleep.Disorder - character, jakościowe, nominalne
 
 
 ########### Zad 2 (0.5pkt) ###########
