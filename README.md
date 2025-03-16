@@ -87,7 +87,7 @@ Wstęp do eksploracji danych składa się z:
     <td>25.mar</td>
     <td>2</td>
     <td>lab</td>
-    <td>R: ggplot2 - zaawansowany oraz rozszerzenia: patchwork, ggrepel</td>
+    <td>R: mapy</td>
     <td>PD2 (6p)</td>
   </tr>
   <tr>
@@ -101,7 +101,7 @@ Wstęp do eksploracji danych składa się z:
     <td>01.kwi</td>
     <td>2</td>
     <td>lab</td>
-    <td>R: mapy</td>
+    <td>R: ggplot2 - zaawansowany oraz rozszerzenia: patchwork, ggrepel</td>
     <td></td>
   </tr>
   <tr>
