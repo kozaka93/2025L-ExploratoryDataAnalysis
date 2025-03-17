@@ -88,7 +88,7 @@ Wstęp do eksploracji danych składa się z:
     <td>2</td>
     <td>lab</td>
     <td><a href="https://github.com/kozaka93/2025L-ExploratoryDataAnalysis/tree/main/labs/lab05">R: mapy</a></td>
-    <td>PD2 (6p)</td>
+    <td><a href="https://github.com/kozaka93/2025L-ExploratoryDataAnalysis/issues/114">PD2</a> (6p)</td>
   </tr>
   <tr>
     <td>26.mar</td>
