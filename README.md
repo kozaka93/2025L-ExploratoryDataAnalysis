@@ -94,7 +94,7 @@ Wstęp do eksploracji danych składa się z:
     <td>26.mar</td>
     <td>2</td>
     <td>wykład</td>
-    <td>Kolory i skale, mapy - czy to takie skomplikowane?</td>
+    <td><a href="https://github.com/kozaka93/2025L-ExploratoryDataAnalysis/blob/main/lectures/L03-colors-scales-maps.pdf">Kolory i skale, mapy - czy to takie skomplikowane?</a></td>
     <td></td>
   </tr>
   <tr>
