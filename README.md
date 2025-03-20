@@ -52,7 +52,7 @@ Wstęp do eksploracji danych składa się z:
     <td>05.mar</td>
     <td>2</td>
     <td>projekt</td>
-    <td>P1: pomysł, źródło danych</td>
+    <td><i>P1: pomysł, źródło danych</i></td>
     <td>P1 (1p)</td>
   </tr>
   <tr>
@@ -80,7 +80,7 @@ Wstęp do eksploracji danych składa się z:
     <td>19.mar</td>
     <td>2</td>
     <td>projekt</td>
-    <td>P1: Prosta eksploracja danych, pomysły na wykresy, prototypy wykresów </td>
+    <td><i>P1: Prosta eksploracja danych, pomysły na wykresy, prototypy wykresów</i> </td>
     <td>P1 (2p)</td>
   </tr>
   <tr>
