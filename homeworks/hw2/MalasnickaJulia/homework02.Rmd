@@ -1,0 +1,169 @@
+---
+title: "Praca domowa 2"
+author: "Julia Małaśnicka"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+    theme: united
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+
+### Wczytanie danych
+df <- read.csv("dane.csv")
+
+```
+
+## Dane 
+Dane wykorzystane w Pracy domowej 2 są związane z kampaniami marketingu bezpośredniego portugalskiej instytucji bankowej. Kampanie marketingowe opierały się na rozmowach telefonicznych. Często wymagany był więcej niż jeden kontakt z tym samym klientem, aby uzyskać dostęp do tego, czy produkt (lokata bankowa) zostanie (lub nie) subskrybowany. Opis wszystkich kolumn znajduje się również w pliku `README.md`.
+
+#### Dane klienta banku
+|Zmienna|Opis|
+|-|-|
+| **age**| wiek|
+|**job** : admin., unknown, unemployed, management, housemaid, entrepreneur, student, blue-collar, self-employed, retired, technician, services|	administrator, nieznany, bezrobotny, kierownictwo, pokojówka, przedsiębiorca, student, pracownik fizyczny, samozatrudniony, emeryt, technik, usługi|
+|**marital** : married, divorced, single; note: divorced means divorced or widowed)|żonaty/zamężna, rozwiedzion_, kawaler/panna; uwaga: rozwiedzion_ oznacza rozwiedzion_ lub owdowiał_|
+|**education** : unknown, secondary, primary, tertiary| nieznane, średnie, podstawowe, wyższe|
+|**default** : yes, no | czy kredyt jest niespłacany : tak, nie|
+|**balance** : average yearly balance, in euros| średnie roczne saldo w euro|
+|**housing** : has housing loan? yes, no |czy posiada kredyt mieszkaniowy? tak, nie|
+|**loan** : has personal loan? yes, no | ma pożyczkę osobistą? tak, nie|
+
+#### Dane związane z ostatnim kontaktem w bieżącej kampanii
+|Zmienna|Opis|
+|-|-|
+|**contact** : unknown, telephone, cellular| nieznany, telefon, komórkowy|
+|**day** : last contact day of the month | dzień miesiąca ostatniego kontaktu|
+|**month** : last contact month of year, jan, feb, mar, ..., nov, dec | miesiąc ostatniego kontaktu w roku, styczeń, luty, marzec, ..., listopad, grudzień|
+|**duration** : last contact duration, in seconds |czas trwania ostatniego kontaktu w sekundach|
+
+
+## Zadanie 1
+
+Weźmy pod uwagę zawody (`job`) klientów banku. Który zawód zacząco wyróżnia się w posiadaniu kredytu mieszkaniowego lub pożyczki osobistej?
+
+
+```{r zadanie 1, message=FALSE}
+
+df %>% 
+  filter(loan == "yes" | housing == "yes") %>% 
+  select(job) %>%
+  ggplot(aes(x=job)) + geom_bar() +
+  labs(title = "Pożyczki w różnych zawodach", x = "Zawód", y = "Liczba osób z pożyczką") +
+  scale_x_discrete(guide = guide_axis(angle = 15))
+
+```
+
+**Komentarz: Wyróżniającym się zawodem w posiadaniu kredytu mieszkaniowego lub pożyczki osobistej jest pracownik fizyczny.**
+
+## Zadanie 2
+
+Wybierając klientów, którzy mają nieznany sposób kontaktu (`contact`). Jak rozkłada się ich wiek w podziale na status związku?
+
+
+```{r zadanie 2, message=FALSE}
+
+df %>% 
+  filter(contact == "unknown") %>% 
+  ggplot(aes(x = marital, y = age)) + geom_boxplot() +
+  labs(title = "Rozkład wieku ze względu na stan cywilny", x = "Stan cywilny", y = "Wiek")
+
+```
+
+**Komentarz: Osoby będące kawalerami/pannami są najczęściej osobami młodszymi, z medianą w okolicach 33 roku życia. Żadko występują osoby o tym statusie po 55 roku życia. Osoby zamężne/żonate występują w całym przedziale wiekowym, z medianą w 41 roku życia. Nie ma osób rozwiedzionych przed 25 rokiem życia. Mediana wieku osób rozwiedzianych to 45 rok życia.**
+
+## Zadanie 3
+
+Jaka jest różnica pomiędzy średnim rocznym saldem w euro w zależności od wykształcenia i tego czy kredyt jest niespłacany?
+
+```{r zadanie 3, message=FALSE}
+
+df %>% 
+  select(balance, education, default) %>% 
+  ggplot(aes(x = education, y = balance, fill = default)) +
+  geom_col(position = position_dodge()) +
+  labs(title = "Zarobki w zależności od wykształcenia i tego czy kredyt jest niespłacany",
+       x = "Wykształcenie", y = "Średnie roczne saldo w euro",
+       fill = "Spłacanie kredytu")
+
+```
+
+**Komentarz: Osoby niespłacające kredytu mają znacznie niższe średnie roczne saldo od spłacających. Osoby bardziej wykształcone mają wyższe średnie roczne saldo od mniej wykształconych.**
+
+## Zadanie 4
+
+Czy dzień i miesiąc kontaktu z klientem ma wpływ na średni czas trwania rozmowy w stosunku do średniego czasu trwania rozmowy?
+```{r zadanie 4, message=FALSE}
+
+df %>% 
+  select(day, month, duration) %>% 
+  mutate(avgDuration = mean(duration)) %>% 
+  group_by(day, month) %>% 
+  mutate(avgDailyDuration = mean(duration, na.rm = TRUE)) %>% 
+  ungroup() %>% 
+  ggplot(aes(x = day, y = avgDailyDuration, color = factor(month))) +
+  geom_point() +
+  geom_hline(aes(yintercept = avgDuration), color = "white", linetype = "dashed", linewidth = 0.5) +
+  facet_wrap(~ month) +
+  labs(title = "Średni czas trwania rozmowy w stosunku do daty", x = "Dzień", y = "Czas rozmowy",
+       color = "Miesiac") +
+  theme_dark()
+
+```
+
+**Komentarz: Treść zadania nie ma sensu. Ogónie większość dni w roku ma średni czas rozmowy zbliżony do średniego czasu rozmowy w roku, ale jest kilka dni w roku kiedy rozmowy są znacznie dłuższe od średniego czasu trwania rozmowy (~10 czerwca, ~13 czerwca, ~13 marca i ~22 listopada).**
+
+## Zadanie 5
+
+Czy jest zależnośc pomiędzy wiekiem klientów a ich średnim rocznym saldzie w euro w podziale na stopień wykształcenia?
+
+
+```{r zadanie 5, message=FALSE}
+
+df %>% 
+  group_by(age, education) %>%
+  summarise(mean_balance = mean(balance), .groups = "drop") %>%
+  ggplot(aes(x = age, y = mean_balance, color = education, fill = education)) +
+  geom_smooth(method = "loess", se = TRUE, alpha = 0.3, size = 1) +
+  labs(title = "Średnie saldo wg wieku i wykształcenia", x = "Wiek", y = "Średnie saldo")
+
+```
+
+**Komentarz: Wraz ze wzrostem wieku średnie saldo wzrasta dla każdego rodzaju wykształcenia. Srednie saldo osiąga maksimum pomiędzy 62 a 80 rokiem życia a następnie maleje. Najbardziej zróżnicowaną grupą pod wzgędem salda jest grupa osób o wykształceniu średnim. Blisko 20 roku życia rodzaj wykształcenia nie ma tak dużego znaczenia. Po 65 roku życia osoby o wykształceniu średnim mają wyraźnie wyższye średnie saldo od reszty.**
+
+## Zadanie 6
+Rozważmy osoby, które są bezrobotne albo ich zawód jest nieznany. Czy procent osób, które są bezrobotne i nie spłacają kredytu jest większy od procenta osób o nieznanym zawodzie i nie spłacanym kredycie? Jaki typ kredytu jest (przez te osoby) najczęściej niespłacany? 
+
+```{r zadanie 6, message=FALSE}
+
+df1 <- df %>% 
+  filter((job == "unknown" | job == "unemployed") & (loan == "yes" | housing == "yes") & (default == "no")) %>% 
+  count(job) %>% 
+  mutate(perc = n / sum(n) * 100, label = paste0(round(perc, 1), "%")) 
+  
+ggplot(df1, aes(x = "", y = n, fill = job)) + 
+  geom_col(width = 1) + 
+  coord_polar("y", start = 0) +
+  geom_text(aes(label = label),
+            position = position_stack(vjust = 0.5)) +
+  labs(title = "Osoby, które nie spłacają kredytu", fill = "Zatrudnienie") + 
+  theme_void()
+
+df2 <- df %>% 
+  filter((job == "unknown" | job == "unemployed") & (loan == "yes" | housing == "yes") & default == "no") %>% 
+  mutate(type = ifelse(loan == "yes", "loan", ifelse(housing == "yes", "housing", "no")))
+
+ggplot(df2, aes(x = type, fill = job)) +
+  geom_bar(position = position_dodge()) + 
+  labs(title = "Rodzaje niespłacanego kredytu",
+       x = "Rodzaj kredytu", y = "Liczba osób", fill = "Zatrudnienie")
+
+```
+
+**Komentarz: Procent osób, które są bezrobotne i nie spłacają kredytu jest większy od procenta osób o nieznanym zawodzie i nie spłacanym kredycie. Najczęściej są niespłacane kredyty mieszkaniowe (przez te osoby).**
