@@ -1,0 +1,180 @@
+---
+title: "pd2"
+author: "maria eberhardt"
+date: "2025-03-24"
+output:
+ html_document:
+  toc: true
+  toc_float: true
+  code_folding: hide
+  theme: united
+---
+
+
+---
+  
+  ```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+#PD2
+#install.packages("dplyr")
+#install.packages("ggplot2")
+#library("dplyr")
+#library("ggplot2")
+
+  
+  
+## Zadanie 1
+  
+#Weźmy pod uwagę zawody (`job`) klientów banku. Który zawód zacząco wyróżnia się w posiadaniu kredytu mieszkaniowego lub pożyczki osobistej?
+  
+  
+  ```{r zadanie 1, message=FALSE}
+df <- read.csv("C:/Users/marys/Downloads/dane.csv")
+#View(df)
+#zad1
+loan_counts <- aggregate(loan ~ job, data = df, FUN = function(x) sum(x == "yes"))
+colnames(loan_counts) <- c("job", "LoanCount")
+print(loan_counts)
+ggplot(loan_counts, aes(x = reorder(job, LoanCount), y = LoanCount)) +
+  geom_bar(stat = "identity", fill = "skyblue") +
+  coord_flip() +
+  labs(title = "Liczba pożyczek w zależności od zawodu",
+       x = "Zawód",
+       y = "Liczba pożyczek") +
+  theme_minimal()
+
+## Zadanie 2
+
+Wybierając klientów, którzy mają nieznany sposób kontaktu (`contact`). Jak rozkłada się ich wiek w podziale na status związku?
+  
+  
+  ```{r zadanie 2, message=FALSE}
+
+#zad2
+unknown_contact <- df[df$contact == "unknown", ]
+age_distribution <- aggregate(age ~ marital, data = unknown_contact, FUN = summary)
+print(age_distribution)
+ggplot(unknown_contact, aes(x = marital, y = age)) +
+  geom_boxplot(fill = "lightblue") +
+  labs(title = "Rozkład wieku klientów z nieznanym kontaktem w podziale na status związku",
+       x = "Status związku",
+       y = "Wiek") +
+  theme_minimal()
+
+## Zadanie 3
+
+Jaka jest różnica pomiędzy średnim rocznym saldem w euro w zależności od wykształcenia i tego czy kredyt jest niespłacany?
+  
+  ```{r zadanie 3, message=FALSE}
+
+#zad3
+balance_stats <- aggregate(balance ~ education + loan, data = df, FUN = mean)
+colnames(balance_stats) <- c("Education", "Loan", "MeanBalance")
+print(balance_stats)
+
+ggplot(balance_stats, aes(x = Education, y = MeanBalance, fill = Loan)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Średnie roczne saldo w zależności od wykształcenia i statusu kredytu",
+       x = "Wykształcenie",
+       y = "Średnie saldo (w euro)",
+       fill = "Status kredytu") +
+  theme_minimal()
+
+#balance_difference <- reshape(balance_stats, timevar = "Loan", idvar = "Education", direction = "wide")
+#balance_difference$Difference <- balance_difference$MeanBalance.no - balance_difference$MeanBalance.yes
+
+#ggplot(balance_difference, aes(x = Education, y = Difference)) +
+#  geom_bar(stat = "identity", fill = "orange") +
+#  labs(title = "Różnica średniego rocznego salda w euro w zależności od wykształcenia",
+#       x = "Wykształcenie",
+#       y = "Różnica średniego salda (osoby bez loanow - osoby z)") +
+#  theme_minimal()
+
+## Zadanie 4
+
+Czy dzień i miesiąc kontaktu z klientem ma wpływ na średni czas trwania rozmowy w stosunku do średniego czasu trwania rozmowy?
+  ```{r zadanie 4, message=FALSE}
+
+#zad4
+overall_mean_duration <- mean(df$duration)
+day_mean <- aggregate(duration ~ day, data = df, FUN = mean)
+month_mean <- aggregate(duration ~ month, data = df, FUN = mean)
+day_mean$Difference <- day_mean$duration - overall_mean_duration
+month_mean$Difference <- month_mean$duration - overall_mean_duration
+
+ggplot(day_mean, aes(x = factor(day), y = Difference)) +
+  geom_bar(stat = "identity", fill = "lightblue") +
+  labs(title = "Różnica w średnim czasie rozmowy w zależności od dnia kontaktu",
+       x = "Dzień miesiąca",
+       y = "Różnica w czasie rozmowy (w sekundach)") +
+  theme_minimal()
+
+ggplot(month_mean, aes(x = factor(month), y = Difference)) +
+  geom_bar(stat = "identity", fill = "lightgreen") +
+  labs(title = "Różnica w średnim czasie rozmowy w zależności od miesiąca kontaktu",
+       x = "Miesiąc",
+       y = "Różnica w czasie rozmowy (w sekundach)") +
+  theme_minimal()
+## Zadanie 5
+
+Czy jest zależnośc pomiędzy wiekiem klientów a ich średnim rocznym saldzie w euro w podziale na stopień wykształcenia?
+
+#zad5 zahashtagowany bo bardzo dlugo sie wywolywal
+
+ #ggplot(df, aes(x = age, y = balance, color = education)) +
+ # geom_point(alpha = 0.6) +  # Punkty na wykresie
+ # geom_smooth(method = "lm", se = FALSE) +  # Regresja liniowa
+ # labs(title = "Zależność między wiekiem a średnim rocznym saldem w euro w podziale na stopień wykształcenia",
+ #    x = "Wiek",
+ #      y = "Średnie roczne saldo (w euro)",
+ #     color = "Wykształcenie") +
+ # theme_minimal()
+
+## Zadanie 6
+Rozważmy osoby, które są bezrobotne albo ich zawód jest nieznany. Czy procent osób, które są bezrobotne i nie spłacają kredytu jest większy od procenta osób o nieznanym zawodzie i nie spłacanym kredycie? Jaki typ kredytu jest (przez te osoby) najczęściej niespłacany? 
+  
+  ```{r zadanie 6, message=FALSE}
+
+
+#zad6
+filtered_data <- df[df$occupation %in% c("unemployed", "unknown"), ]
+unemployed_data <- filtered_data[filtered_data$occupation == "unemployed", ]
+unknown_data <- filtered_data[filtered_data$occupation == "unknown", ]
+unemployed_loan <- nrow(unemployed_data[unemployed_data$loan == "yes", ])
+unknown_loan <- nrow(unknown_data[unknown_data$Loan == "yes", ])
+percent_unemployed <- (unemployed_loan / nrow(unemployed_data)) * 100
+percent_unknown <- (unknown_loan / nrow(unknown_data)) * 100
+
+comparison <- ifelse(percent_unemployed > percent_unknown, 
+                     "Bezrobotni mają większy procent niespłacanych kredytów", 
+                     "Osoby o nieznanym zawodzie mają większy procent niespłacanych kredytów")
+comparison
+
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+  ```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
