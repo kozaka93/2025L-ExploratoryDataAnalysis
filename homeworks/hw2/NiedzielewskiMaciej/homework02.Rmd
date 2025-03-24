@@ -1,0 +1,197 @@
+---
+title: "Praca domowa 2"
+author: "Maciej Niedzielewski"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+    theme: united
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+
+### Wczytanie danych
+df <- read.csv("dane.csv")
+
+```
+
+## Dane 
+Dane wykorzystane w Pracy domowej 2 są związane z kampaniami marketingu bezpośredniego portugalskiej instytucji bankowej. Kampanie marketingowe opierały się na rozmowach telefonicznych. Często wymagany był więcej niż jeden kontakt z tym samym klientem, aby uzyskać dostęp do tego, czy produkt (lokata bankowa) zostanie (lub nie) subskrybowany. Opis wszystkich kolumn znajduje się również w pliku `README.md`.
+
+#### Dane klienta banku
+|Zmienna|Opis|
+|-|-|
+| **age**| wiek|
+|**job** : admin., unknown, unemployed, management, housemaid, entrepreneur, student, blue-collar, self-employed, retired, technician, services|	administrator, nieznany, bezrobotny, kierownictwo, pokojówka, przedsiębiorca, student, pracownik fizyczny, samozatrudniony, emeryt, technik, usługi|
+|**marital** : married, divorced, single; note: divorced means divorced or widowed)|żonaty/zamężna, rozwiedzion_, kawaler/panna; uwaga: rozwiedzion_ oznacza rozwiedzion_ lub owdowiał_|
+|**education** : unknown, secondary, primary, tertiary| nieznane, średnie, podstawowe, wyższe|
+|**default** : yes, no | czy kredyt jest niespłacany : tak, nie|
+|**balance** : average yearly balance, in euros| średnie roczne saldo w euro|
+|**housing** : has housing loan? yes, no |czy posiada kredyt mieszkaniowy? tak, nie|
+|**loan** : has personal loan? yes, no | ma pożyczkę osobistą? tak, nie|
+
+#### Dane związane z ostatnim kontaktem w bieżącej kampanii
+|Zmienna|Opis|
+|-|-|
+|**contact** : unknown, telephone, cellular| nieznany, telefon, komórkowy|
+|**day** : last contact day of the month | dzień miesiąca ostatniego kontaktu|
+|**month** : last contact month of year, jan, feb, mar, ..., nov, dec | miesiąc ostatniego kontaktu w roku, styczeń, luty, marzec, ..., listopad, grudzień|
+|**duration** : last contact duration, in seconds |czas trwania ostatniego kontaktu w sekundach|
+
+
+## Zadanie 1
+
+Weźmy pod uwagę zawody (`job`) klientów banku. Który zawód zacząco wyróżnia się w posiadaniu kredytu mieszkaniowego lub pożyczki osobistej?
+
+
+```{r zadanie 1, message=FALSE}
+
+# Tu umieść kod do wygenerowania odpowiedzi do zadania.
+# loan housing
+df %>% 
+  select(job, housing, loan) %>% 
+  group_by(job) %>% 
+  summarise(housing_percent = sum(housing == "yes")/n()*100, 
+         loan_percent = sum(loan == "yes")/n()*100) %>% 
+  ggplot(aes(x = housing_percent, y = loan_percent, color = job))+
+  geom_point(size=5)+
+  theme_minimal()+
+  labs(x = "procent pożyczki mieszkaniowej", y ="procent pożyczki osobistej", color = "praca")
+
+```
+
+**Komentarz: Pożyczki osobiste najczęściej występują u przedsiębiorców, a mieszkaniowe u tzw. blue-collar workers**
+
+## Zadanie 2
+
+Wybierając klientów, którzy mają nieznany sposób kontaktu (`contact`). Jak rozkłada się ich wiek w podziale na status związku?
+
+
+```{r zadanie 2, message=FALSE}
+
+# Tu umieść kod do wygenerowania odpowiedzi do zadania.
+df %>% 
+  select(contact, age, marital) %>% 
+  filter(contact == "unknown") %>% 
+  ggplot(aes(x = age, fill = marital)) +
+  geom_histogram(binwidth = 5, position = "dodge") +  
+  labs(title = "Rozkład wieku klientów z nieznanym kontaktem",
+       x = "Wiek",
+       y = "Liczba klientów",
+       fill = "Status związku") +
+  theme_minimal()
+
+```
+
+**Komentarz: Liczba klientów w związku małżeńskim od 20 do ok. 40 roku życia wzrasta wraz ze wzrostem wieku po czym stale maleje. W przypadku osób w wieku 20-stu 30-stu paru większość z nich jest singlami, natomiast ich liczba później stale majeje. Liczba osób rozwiedzonych w wieku około 35-55 lat jest bardzo stabilna i od wieku ok. 45 lat większa od liczby singli. **
+
+## Zadanie 3
+
+Jaka jest różnica pomiędzy średnim rocznym saldem w euro w zależności od wykształcenia i tego czy kredyt jest niespłacany?
+
+```{r zadanie 3, message=FALSE}
+
+# Tu umieść kod do wygenerowania odpowiedzi do zadania.
+df %>% 
+  select(balance, default, education) %>% 
+  group_by(education, default) %>% 
+  summarise(mean_balance = mean(balance)) %>% 
+  ggplot(aes(x = education, y = mean_balance, fill = default))+
+  geom_col()+
+  labs(title = "Średnie roczne saldo w euro, a wykształcenie i kredyt",
+       x = "Wykształcenie",
+       y = "Średnie saldo (euro)",
+       fill = "Czy kredyt niespłacony?") +
+  theme_minimal()
+
+```
+
+**Komentarz: W przypadku osób z niespłaconym kredytem ich średnie saldo jest poniżej zera, natomiast pośród osób ze spłacalnym kredytem średnio występują salda dodatnie, z czego najwyższe są średnio u osób z wykształceniem wyższym**
+
+
+## Zadanie 4
+
+Czy dzień i miesiąc kontaktu z klientem ma wpływ na średni czas trwania rozmowy w stosunku do średniego czasu trwania rozmowy?
+```{r zadanie 4, message=FALSE}
+
+# Tu umieść kod do wygenerowania odpowiedzi do zadania.
+df %>% 
+  select(day, month, duration) %>% 
+  group_by(month, day) %>% 
+  summarise(mean_duration = mean(duration)) %>% 
+  ggplot(aes(x = day, y = mean_duration)) +
+  geom_col()+
+  facet_wrap(~factor(month,levels=c("jan", "feb", "mar", "apr", "may", "jun", 
+                  "jul", "aug", "sep", "oct", "nov", "dec")))+
+  labs(y = "średni czas trwania rozmowy (sekundy)", x = "dzień miesiąca")
+
+```
+
+**Komentarz: Tak, dzień i miesiąc kontaktu z klientem ma wpływ na średni czas trwania rozmowy. Istotnie w marcy, czerwcu i listopadzie są dni, w których rozmowy średnio trwają znacznie dłużej. Ponadto są dni, w których rozmowy trwają średnio bardzo krótko w porównaniu do pozostałych szczególnie w styczniu.  **
+
+## Zadanie 5
+
+Czy jest zależnośc pomiędzy wiekiem klientów a ich średnim rocznym saldzie w euro w podziale na stopień wykształcenia?
+
+
+```{r zadanie 5, message=FALSE}
+
+# Tu umieść kod do wygenerowania odpowiedzi do zadania.
+df %>%
+  mutate(age_group = cut(age, breaks = seq(20, 90, by = 10), include.lowest = TRUE)) %>% 
+  select(age_group, balance, education) %>%
+  group_by(age_group, education) %>%
+  summarise(mean_balance = mean(balance, na.rm = TRUE)) %>%
+  ggplot(aes(x = as.numeric(age_group), y = mean_balance)) +
+  geom_point() +
+  geom_smooth()+
+  facet_wrap(~education, scales = "free_y")+
+  labs(y = "średnie saldo", x ="grupa wiekowa (20-30), (30-40), ..., (80, 90)")
+
+  
+```
+
+**Komentarz: W każdej z grup niezależnie od stopnia edukacji wraz ze wzrostem wieku jest tendencja wzrostu salda. **
+
+## Zadanie 6
+Rozważmy osoby, które są bezrobotne albo ich zawód jest nieznany. Czy procent osób, które są bezrobotne i nie spłacają kredytu jest większy od procenta osób o nieznanym zawodzie i nie spłacanym kredycie? Jaki typ kredytu jest (przez te osoby) najczęściej niespłacany? 
+
+```{r zadanie 6, message=FALSE}
+
+# Tu umieść kod do wygenerowania odpowiedzi do zadania.
+table1 <- df %>% 
+  select(job, default) %>% 
+  filter(job %in% c("unemployed", "unknown")) %>% 
+  group_by(job) %>% 
+  summarise(percentage = sum(default == "yes")/ n() *100) 
+
+popular_loan <- df %>% 
+  filter(job %in% c("unemployed", "unknown")) %>% 
+  select(job, housing, loan) %>% 
+  pivot_longer(cols = c("housing", "loan"), names_to = "loan_type", values_to = "status") %>% 
+  filter(!is.na(status) & status == "yes") %>% 
+  group_by(job, loan_type) %>% 
+  summarise(count = n(), .groups = "drop") %>% 
+  group_by(job) %>% 
+  slice_max(order_by = count, n = 1, with_ties = FALSE) %>% 
+  ungroup()
+
+table2 <- table1 %>% 
+  left_join(popular_loan, by = "job") 
+
+ggplot(table2, aes(x = job, y = percentage, fill = loan_type))+
+  geom_col()+
+  theme_minimal()+
+  labs(x = "praca", y= "procent", fill = "najpowszechniej niespłacany typ kredytu")
+  
+  
+
+```
+
+**Komentarz: Procent osób, które są bezrobotne i nie spłacają kredytu jest większy od procenta osób o nieznanym zawodzie i nie spłacanym kredycie. W obydwu tych grupach najczęściej niespłacany jest kredyt mieszkaniowy. **
