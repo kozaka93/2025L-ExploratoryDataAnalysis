@@ -1,0 +1,355 @@
+---
+title: "Praca domowa 2"
+author: "Kacper Wróbel"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+    theme: united
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+
+### Wczytanie danych
+df <- read.csv("dane.csv")
+
+```
+
+## Dane 
+Dane wykorzystane w Pracy domowej 2 są związane z kampaniami marketingu bezpośredniego portugalskiej instytucji bankowej. Kampanie marketingowe opierały się na rozmowach telefonicznych. Często wymagany był więcej niż jeden kontakt z tym samym klientem, aby uzyskać dostęp do tego, czy produkt (lokata bankowa) zostanie (lub nie) subskrybowany. Opis wszystkich kolumn znajduje się również w pliku `README.md`.
+
+#### Dane klienta banku
+|Zmienna|Opis|
+|-|-|
+| **age**| wiek|
+|**job** : admin., unknown, unemployed, management, housemaid, entrepreneur, student, blue-collar, self-employed, retired, technician, services|	administrator, nieznany, bezrobotny, kierownictwo, pokojówka, przedsiębiorca, student, pracownik fizyczny, samozatrudniony, emeryt, technik, usługi|
+|**marital** : married, divorced, single; note: divorced means divorced or widowed)|żonaty/zamężna, rozwiedzion_, kawaler/panna; uwaga: rozwiedzion_ oznacza rozwiedzion_ lub owdowiał_|
+|**education** : unknown, secondary, primary, tertiary| nieznane, średnie, podstawowe, wyższe|
+|**default** : yes, no | czy kredyt jest niespłacany : tak, nie|
+|**balance** : average yearly balance, in euros| średnie roczne saldo w euro|
+|**housing** : has housing loan? yes, no |czy posiada kredyt mieszkaniowy? tak, nie|
+|**loan** : has personal loan? yes, no | ma pożyczkę osobistą? tak, nie|
+
+#### Dane związane z ostatnim kontaktem w bieżącej kampanii
+|Zmienna|Opis|
+|-|-|
+|**contact** : unknown, telephone, cellular| nieznany, telefon, komórkowy|
+|**day** : last contact day of the month | dzień miesiąca ostatniego kontaktu|
+|**month** : last contact month of year, jan, feb, mar, ..., nov, dec | miesiąc ostatniego kontaktu w roku, styczeń, luty, marzec, ..., listopad, grudzień|
+|**duration** : last contact duration, in seconds |czas trwania ostatniego kontaktu w sekundach|
+
+
+## Zadanie 1
+
+Weźmy pod uwagę zawody (`job`) klientów banku. Który zawód zacząco wyróżnia się w posiadaniu kredytu mieszkaniowego lub pożyczki osobistej?
+
+
+```{r zadanie 1, message=FALSE}
+
+# Tu umieść kod do wygenerowania odpowiedzi do zadania.
+df %>%
+  mutate(any_loan = case_when((loan == "yes" | housing == "yes") ~ 1,
+                              TRUE ~ 0)) %>%
+  group_by(job) %>%
+  summarise(n_of_loans = sum(any_loan)) %>%
+  mutate(job = forcats::fct_reorder(job, -n_of_loans)) %>%
+  ggplot(aes(x=n_of_loans, y=job)) +
+  geom_col(fill="#425dbe") +
+  labs(title = "Liczba posiadaczy kredytu mieszkaniowego lub pożyczki osobistej",
+       subtitle = "w zależności od wykonywanego zawodu",
+       x = "liczba kredytów i pożyczek",
+       y = "zawód",
+       fill = "typ kredytu") +
+  theme_minimal() +
+  scale_y_discrete(labels = c("unknown" = "nieznany",
+                              "housemaid" = "pomoc domowa",
+                              "unemployed" = "bezrobotni",
+                              "retired" = "emerytowani",
+                              "self-employed" = "samozatrudnieni",
+                              "entrepreneur" = "przedsiębiorcy",
+                              "services" = "usługi",
+                              "admin." = "administratorzy",
+                              "technician" = "obsługa techniczna",
+                              "management" = "zarządzanie",
+                              "blue-collar" = "pracownicy fizyczni"))
+
+df %>%
+  mutate(any_loan = case_when((loan == "yes" | housing == "yes") ~ 1,
+                              TRUE ~ 0)) %>%
+  group_by(job) %>%
+  summarise(n_of_loans = sum(any_loan), 
+            n = n(), 
+            percent_loan = n_of_loans / n * 100) %>%
+  mutate(job = forcats::fct_reorder(job, -percent_loan)) %>%
+  select(!c(n_of_loans, n)) %>%
+  ggplot(aes(y=job, x=percent_loan)) +
+  geom_col(fill = "#425dbe") +
+  labs(title = "Procent posiadaczy kredytu mieszkaniowego lub pożyczki osobistej",
+       subtitle = "w zależności od wykonywanego zawodu",
+       x = "%",
+       y = "zawód") +
+  theme_minimal() +
+  scale_y_discrete(labels = c("unknown" = "nieznany",
+                              "housemaid" = "pomoc domowa",
+                              "unemployed" = "bezrobotni",
+                              "retired" = "emerytowani",
+                              "self-employed" = "samozatrudnieni",
+                              "entrepreneur" = "przedsiębiorcy",
+                              "services" = "usługi",
+                              "admin." = "administratorzy",
+                              "technician" = "obsługa techniczna",
+                              "management" = "zarządzanie",
+                              "blue-collar" = "pracownicy fizyczni")) +
+  xlim(c(0, 100))
+```
+
+**Komentarz:**
+
+Pracownicy fizyczni znacząco wyróżniają się pod względem posiadania kredytu mieszkaniowego lub pożyczki osobistej. Widzimy jednak, że pomimo niskiej liczby kredytów wśród samozatrudnionych i przedsiębiorców, udział osób z kredytem wśród nich jest podobny do zawodów, gdzie kredytów jest najwięcej. Może to wynikać z tego, że przedsiębiorcy i samozatrudnieni częściej zaciągają kredyt na działalność, a pracownicy fizyczni ze względu na stosunkowo niskie zarobki, potrzebują kredytu mieszkaniowego.
+
+## Zadanie 2
+
+Wybierając klientów, którzy mają nieznany sposób kontaktu (`contact`). Jak rozkłada się ich wiek w podziale na status związku?
+
+
+```{r zadanie 2, message=FALSE}
+
+# Tu umieść kod do wygenerowania odpowiedzi do zadania.
+df %>%
+  filter(contact == "unknown") %>%
+  ggplot(aes(age, fill = marital, colour = marital)) +
+  geom_density(linewidth = 0.8, alpha = 0.4) +
+  labs(title = "Rozkład wieku klientów, którzy mają nieznany sposób kontaktu",
+       subtitle = "w podziale na status związku",
+       x = "wiek",
+       y = "gęstość") +
+  theme_minimal() +
+  scale_x_continuous(limits = c(15, 70), breaks = seq(15, 70, 5)) +
+  theme(legend.position = "bottom", legend.title = element_blank()) +
+  scale_fill_discrete(labels = c("rozwiedzeni/owdowieni", "żonaci/mężatki", "single")) +
+  scale_color_discrete(labels = c("rozwiedzeni/owdowieni", "żonaci/mężatki", "single"))
+
+```
+
+**Komentarz:**
+
+Osoby bez partnera są z reguły o wiele młodsze, niż klienci z pozostałych kategorii i z dużym prawdopodobieństwem ich wiek oscyluje w przedziale [25, 40]. Mężatki oraz żonaci są najczęściej w wieku 32-45, a ich liczba wraz z wiekiem minimalnie spada. Wiek rozwiedzonych oraz owdowiałych natomiast rozkłada się równomiernie od 35 do 60 lat. Ponadto liczba singli po 40 r. ż. znacząco spada, tzn. większość ludzi po tym wieku ma już partnera.
+
+## Zadanie 3
+
+Jaka jest różnica pomiędzy średnim rocznym saldem w euro w zależności od wykształcenia i tego czy kredyt jest niespłacany?
+
+```{r zadanie 3, message=FALSE}
+
+# Tu umieść kod do wygenerowania odpowiedzi do zadania.
+df %>%
+  group_by(education, default) %>%
+  summarise(mean_balance = mean(balance)) %>% 
+  tidyr::pivot_wider(names_from = default, values_from = mean_balance) %>%
+  ggplot() +
+  geom_segment(aes(y= education, x = yes, xend = no)) +
+  geom_point(aes(y = education, x = yes, color = "red"), size=5) +
+  geom_point(aes(y = education, x = no, color = "navy"), size=5) +
+  scale_color_manual(labels = c("tak", "nie"), values = c("red", "navy")) +
+  labs(title = "Różnica pomiędzy średnim rocznym saldem w euro",
+       subtitle = "w zależności od wykształcenia i tego czy kredyt jest spłacany",
+       y = "wykształcenie",
+       x = "średnie roczne saldo",
+       colour = "Czy spłaca kredyt?") +
+  scale_y_discrete(labels = c("primary" = "podstawowe", 
+                              "secondary" = "średnie", 
+                              "tertiary" = "wyższe", 
+                              "unknown" = "nieznane")) +
+  scale_x_continuous(limits = c(-300, 1800), breaks = seq(-300, 1800, 300)) +
+  geom_vline(xintercept = 0, linetype = "dotted", linewidth = 1) +
+  theme_minimal()
+
+```
+
+**Komentarz:**
+
+Klienci niespłacający kredytu niezależnie od wykształcenia mają średnio ujemne roczne saldo w euro, co wydaje się oczywiste, bo z reguły osoby niespłacające pożyczek nie mają pieniędzy na kolejne raty. Najwyższa różnica jest pomiędzy osobami z wykształceniem wyższym i wynosi ona około 2000 euro, a najniższa wśród osob z wykszałceniem średnim i wynosi mniej więcej 1300 euro. Ponadto wysokie średnie roczne saldo osób z wyższym wykształceniem spłacającym kredyt może świadczyć o ich wysokich zarobkach w porównaniu do reszty grup. 
+
+## Zadanie 4
+
+Czy dzień i miesiąc kontaktu z klientem ma wpływ na średni czas trwania rozmowy w stosunku do średniego czasu trwania rozmowy?
+```{r zadanie 4, message=FALSE}
+
+# Tu umieść kod do wygenerowania odpowiedzi do zadania.
+df %>% 
+  mutate(day_interval = cut_interval(as.numeric(day), n = 6),
+         month_number = case_when((month == "jan") ~ 1,
+                                  (month == "feb") ~ 2,
+                                  (month == "mar") ~ 3,
+                                  (month == "apr") ~ 4,
+                                  (month == "may") ~ 5,
+                                  (month == "jun") ~ 6,
+                                  (month == "jul") ~ 7,
+                                  (month == "aug") ~ 8,
+                                  (month == "sep") ~ 9,
+                                  (month == "oct") ~ 10,
+                                  (month == "nov") ~ 11,
+                                  TRUE ~ 12),
+         month = forcats::fct_reorder(month, month_number)) %>%
+  group_by(day_interval, month) %>%
+  summarise(mean_duration = mean(duration)) %>%
+  ggplot(aes(x=month, y=mean_duration, fill=day_interval)) +
+  geom_col() +
+  scale_x_discrete(labels = c("jan" = "sty",
+                              "feb" = "lut",
+                              "mar" = "mar",
+                              "apr" = "kwi",
+                              "may" = "maj",
+                              "jun" = "cze",
+                              "jul" = "lip",
+                              "aug" = "sie",
+                              "sep" = "wrz",
+                              "oct" = "paź",
+                              "nov" = "lis",
+                              "dec" = "gru")) +
+  ggtitle("Średni czas trwania rozmowy z klientem", 
+          subtitle = "w zależności od miesiąca i dnia") +
+  labs(x = "miesiąc",
+       y = "średni czas (sekundy)",
+       fill = "przedział dni") +
+  theme_minimal()
+
+df %>% 
+  mutate(month_number = case_when((month == "jan") ~ 1,
+                                  (month == "feb") ~ 2,
+                                  (month == "mar") ~ 3,
+                                  (month == "apr") ~ 4,
+                                  (month == "may") ~ 5,
+                                  (month == "jun") ~ 6,
+                                  (month == "jul") ~ 7,
+                                  (month == "aug") ~ 8,
+                                  (month == "sep") ~ 9,
+                                  (month == "oct") ~ 10,
+                                  (month == "nov") ~ 11,
+                                  TRUE ~ 12),
+         month = forcats::fct_reorder(month, month_number)) %>%
+  group_by(day, month) %>%
+  summarise(mean_duration = mean(duration)) %>%
+  ggplot(aes(x = day, y = mean_duration)) +
+  geom_point() +
+  geom_smooth() + 
+  ylim(c(0, 500)) +
+  facet_wrap(~month, 
+             scales = "free_y",
+             labeller = labeller(month = c(jan = "sty",
+                                           feb = "lut",
+                                           mar = "mar",
+                                           apr = "kwi",
+                                           may = "maj",
+                                           jun = "cze",
+                                           jul = "lip",
+                                           aug = "sie",
+                                           sep = "wrz",
+                                           oct = "paź",
+                                           nov = "lis",
+                                           dec = "gru"))) + 
+  ggtitle("Średni czas trwania rozmowy z klientem", 
+          subtitle = "w zależności od miesiąca i dnia") +
+  labs(x = "dzień",
+       y = "średni czas (sekundy)") +
+  theme_bw()
+
+```
+
+**Komentarz:**
+
+Miesiąc kontaktu ma lekki wpływ na średni czas trwania rozmowy z klientem, tzn. kwiecień i grudzień przejawiał się wyższymi wartościami w porównaniu do reszty roku. Widzimy, że np. w początkowych dniach stycznia, tak jak można było się spodziewać, rozmowy trwały bardzo krótko w porównaniu do reszty roku. Można zauważyć, że często pojawiają się wartości bliskie zera, które mogą być obserwacjami z niedziel/świąt.
+
+Na wykresie zostały pominięte outliery, których średni czas rozmowy wykraczał poza 500 sekund, gdyż w porównaniu z innymi wartościami nie dawały żadnych informacji o występującym trendzie.
+
+## Zadanie 5
+
+Czy jest zależnośc pomiędzy wiekiem klientów a ich średnim rocznym saldzie w euro w podziale na stopień wykształcenia?
+
+
+```{r zadanie 5, message=FALSE}
+
+# Tu umieść kod do wygenerowania odpowiedzi do zadania.
+df %>%
+  group_by(age, education) %>%
+  summarise(mean_balance = mean(balance)) %>%
+  ggplot(aes(x=age, y=mean_balance)) +
+  geom_point() +
+  geom_smooth() +
+  ylim(c(0, 10000)) +   #zmieniam zakres wyswietlanych wartosci, poniewaz bez tego
+                        #wykres robi sie nieczytelny przez outlier z kategorii secondary
+  facet_wrap(~education, 
+             scales = "free_y",
+             labeller = labeller(education  = c(primary = "podstawowe",
+                                                secondary = "średnie",
+                                                tertiary = "wyższe",
+                                                unknown = "nieznane"))) +
+  labs(title = "Wiek klientów a ich średnie roczne saldo w euro",
+       subtitle = "w podziale na stopień wykształcenia",
+       x = "wiek",
+       y = "średnie roczne saldo") +
+  theme_bw()
+
+```
+
+**Komentarz:**
+
+Dla każdej kategorii, średnie roczne saldo w euro jest zależne od wieku, tzn. rośnie ono do około 70-75 roku życia, a następnie maleje. Może to wynikać z tego, że gromadzony w trakcie pracy kapitał zostaje zużyty na życie w trakcie emerytury, podczas której świadczenia otrzymywane przez klientów są niższe niż wcześniejsze zarobki.
+Widzimy ponadto, że średni roczny balans klientów z wykształceniem podstawowym i średnim rośnie wolniej niż osób z wykształceniem, co może być spowodowane niższymi zarobkiami lub mniejszą świadomością o potrzebie oszczędzania.  
+
+Na wykresie zostały pominięte outliery, których średnie roczne saldo wykraczało poza 10 000 euro, ponieważ w porównaniu z innymi obserwacjami są niemiarodajne.
+
+## Zadanie 6
+
+Rozważmy osoby, które są bezrobotne albo ich zawód jest nieznany. Czy procent osób, które są bezrobotne i nie spłacają kredytu jest większy od procenta osób o nieznanym zawodzie i nie spłacanym kredycie? Jaki typ kredytu jest (przez te osoby) najczęściej niespłacany? 
+
+```{r zadanie 6, message=FALSE}
+
+# Tu umieść kod do wygenerowania odpowiedzi do zadania.
+df6 <- df %>%
+  filter(job %in% c("unknown", "unemployed")) %>%
+  mutate(housing = case_when((housing == "yes") ~ 1,
+                             TRUE ~ 0),
+         loan = case_when((loan == "yes") ~ 1,
+                          TRUE ~ 0),
+         default = case_when((default == "yes") ~ 1,
+                             TRUE ~ 0)) %>%
+  mutate(default_housing = case_when(((housing == 1) & (default == 1)) ~ 1,
+                                     TRUE ~ 0),
+         default_loan = case_when(((loan == 1) & (default == 1)) ~ 1,
+                                  TRUE ~ 0)) %>%
+  group_by(job) %>%
+  summarise(all = n(), 
+            all_default = sum(default),
+            housing_default = sum(default_housing),
+            loan_default = sum(default_loan)) %>%
+  mutate(percent_default = all_default / all * 100,
+         percent_housing_default = housing_default / all * 100,
+         percent_loan_default = loan_default / all * 100)
+
+df6 %>%
+  mutate(percent_other_default = percent_default - (percent_housing_default + percent_loan_default)) %>%
+  select(!c(all, all_default, housing_default, loan_default, percent_default)) %>%
+  tidyr::pivot_longer(!job, names_to = "group", values_to = "percent") %>%
+  ggplot(aes(x = job, y = percent, fill = group)) +
+  scale_fill_discrete("typ kredytu",
+                      labels = c("kredyt mieszkaniowy", "pożyczka osobista", "inne")) +
+  geom_col() +
+  labs(title = "Procent klientów, którzy nie spłacają kredytu",
+       subtitle = "w podziale na osoby bezrobotne i o nieznanym statusie zatrudnienia",
+       x = "status zatrudnienia",
+       y = "%") +
+  scale_x_discrete(labels = c("unemployed" = "bezrobotni", 
+                              "unknown" = "nieznane")) +
+  ylim(c(0, 3)) +
+  theme_bw()
+```
+
+**Komentarz:**
+
+Procent osób, które są bezrobotne i nie spłacają kredytu jest większy od procenta osób o nieznanym zawodzie i nie spłacanym kredycie. Klienci z pierwszej grupy najczęściej nie spłacają kredytu mieszkaniowego. Może to być spowodowane tym, że osoby bezrobotne straciły pracę w trakcie spłacania kredytu mieszkaniowego, przez co nie mają pieniędzy na kolejne raty. Pożyczki osobiste są natomiast z reguły na mniejsze kwoty i na krótszy okres niż kredyty mieszkaniowe, czyli osoby niezatrudnione mogły po prostu ich nie otrzymać. 
