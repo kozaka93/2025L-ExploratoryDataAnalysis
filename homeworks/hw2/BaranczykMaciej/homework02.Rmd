@@ -1,0 +1,209 @@
+---
+title: "Praca domowa 2"
+author: "Maciej Barańczyk"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+    theme: united
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+
+### Wczytanie danych
+df <- read.csv("dane.csv")
+
+```
+
+## Dane 
+Dane wykorzystane w Pracy domowej 2 są związane z kampaniami marketingu bezpośredniego portugalskiej instytucji bankowej. Kampanie marketingowe opierały się na rozmowach telefonicznych. Często wymagany był więcej niż jeden kontakt z tym samym klientem, aby uzyskać dostęp do tego, czy produkt (lokata bankowa) zostanie (lub nie) subskrybowany. Opis wszystkich kolumn znajduje się również w pliku `README.md`.
+
+#### Dane klienta banku
+|Zmienna|Opis|
+|-|-|
+| **age**| wiek|
+|**job** : admin., unknown, unemployed, management, housemaid, entrepreneur, student, blue-collar, self-employed, retired, technician, services|	administrator, nieznany, bezrobotny, kierownictwo, pokojówka, przedsiębiorca, student, pracownik fizyczny, samozatrudniony, emeryt, technik, usługi|
+|**marital** : married, divorced, single; note: divorced means divorced or widowed)|żonaty/zamężna, rozwiedzion_, kawaler/panna; uwaga: rozwiedzion_ oznacza rozwiedzion_ lub owdowiał_|
+|**education** : unknown, secondary, primary, tertiary| nieznane, średnie, podstawowe, wyższe|
+|**default** : yes, no | czy kredyt jest niespłacany : tak, nie|
+|**balance** : average yearly balance, in euros| średnie roczne saldo w euro|
+|**housing** : has housing loan? yes, no |czy posiada kredyt mieszkaniowy? tak, nie|
+|**loan** : has personal loan? yes, no | ma pożyczkę osobistą? tak, nie|
+
+#### Dane związane z ostatnim kontaktem w bieżącej kampanii
+|Zmienna|Opis|
+|-|-|
+|**contact** : unknown, telephone, cellular| nieznany, telefon, komórkowy|
+|**day** : last contact day of the month | dzień miesiąca ostatniego kontaktu|
+|**month** : last contact month of year, jan, feb, mar, ..., nov, dec | miesiąc ostatniego kontaktu w roku, styczeń, luty, marzec, ..., listopad, grudzień|
+|**duration** : last contact duration, in seconds |czas trwania ostatniego kontaktu w sekundach|
+
+
+## Zadanie 1
+
+Weźmy pod uwagę zawody (`job`) klientów banku. Który zawód zacząco wyróżnia się w posiadaniu kredytu mieszkaniowego lub pożyczki osobistej?
+
+
+```{r zadanie 1, message=FALSE}
+
+df %>% 
+  filter(housing=='yes'|loan=='yes') %>% 
+  group_by(job) %>% 
+  summarise(ile=n()) %>% 
+  mutate(job=forcats::fct_reorder(job,ile,.desc = TRUE)) %>% 
+  ggplot(aes(x=job,y=ile))+
+  geom_col()+
+  scale_y_continuous(expand=c(0,0))+
+  scale_x_discrete(
+    guide=guide_axis(
+      angle=30))+
+  labs(title = "Number of people with a housing loan or a personal loan \n broken down by occupation",
+       x = "Occupation",
+       y="Number of people")+ 
+  theme(plot.title = element_text(size=12,hjust=0.5))
+  
+```
+
+**Komentarz:** Zdecydowanie najwięcej osób posiadających kredyt mieszkaniowy lub pożyczkę osobistą pracuje jako pracownik fizyczny.
+
+## Zadanie 2
+
+Wybierając klientów, którzy mają nieznany sposób kontaktu (`contact`). Jak rozkłada się ich wiek w podziale na status związku?
+
+
+```{r zadanie 2, message=FALSE}
+df %>% 
+  filter(contact=='unknown') %>% 
+  ggplot(aes(x=age,color=marital))+
+  geom_density(linewidth=1.2)+
+  scale_x_continuous(expand=c(0,0))+
+  labs(title = "Age distribution of customers with an unknown contact method,\n broken down by their marital status",
+       x = "Age",
+       y = "Number of people",
+       color = "Marital status")+ 
+  theme(plot.title = element_text(hjust=0.5))
+
+```
+
+**Komentarz:** Wśród osób o nieznanym sposobie kontaktu młodsze osoby są najczęściej singlami. Ich liczba maleje wraz z wiekiem. Wśród osób 35+ przeważają zamężni i rozwodnicy, ich liczba jest zbliżona. Osoby starsze są natomiast najczęściej rozwiedzeni.
+
+## Zadanie 3
+
+Jaka jest różnica pomiędzy średnim rocznym saldem w euro w zależności od wykształcenia i tego czy kredyt jest niespłacany?
+
+```{r zadanie 3, message=FALSE}
+
+df %>% 
+  group_by(education,default) %>% 
+  summarise(avg_balance=mean(balance,na.rm=TRUE)) %>% 
+  ggplot(aes(x=education,y=avg_balance,fill=default))+
+  geom_col(position='dodge2')+
+  labs(title = "Analysis of unemployed or those with unknown employment who are not repaying their loan.",
+       x = "Education",
+       y = "Average yearly balance, in euros",
+       fill = "The loan is not being repaid?")+
+  scale_fill_manual(
+    values=c("red","#0c710c")
+  )
+
+```
+
+**Komentarz:** Osoby niespłacające kredytu mają najczęściej ujemne saldo na koncie. Największy deficyt można zauważyć u osób posiadających wykształcenie podstawowe oraz nieznane. Pomimo tego, że osoby z wykształceniem średnim mają średnio najmniejszy deficyt na koncie, gdy nie spłacają kredytu, to ich saldo jest najmniejsze wśród osób spłacających kredyt. Największe obserwujemy natomiast u osób z wykształceniem wyższym a także nieznanym.
+
+## Zadanie 4
+
+Czy dzień i miesiąc kontaktu z klientem ma wpływ na średni czas trwania rozmowy w stosunku do średniego czasu trwania rozmowy?
+```{r zadanie 4, message=FALSE}
+
+df %>% 
+  group_by(day,month) %>% 
+  mutate(avg_dur=mean(duration,na.rm=TRUE)-mean(df$duration),
+         month=factor(month,levels=c("jan", "feb", "mar", "apr", "may", "jun", 
+               "jul", "aug", "sep", "oct", "nov", "dec"))) %>% 
+  ggplot(aes(x=day,y=avg_dur))+
+  geom_line()+
+  geom_hline(yintercept=0,linetype="dashed", color = "darkgrey", size=0.8)+
+  facet_wrap(~month)+
+  ylim(-300,600)+
+  scale_x_continuous(breaks=seq(1,31,by=5))+
+  labs(title = "Relationship between the day and month of customer contact \n and the average call duration.",
+       x = "Day of month",
+       y = "Difference between the average call duration on a given day and the annual average.")+ 
+  theme(plot.title = element_text(hjust=0.5))
+```
+
+**Komentarz:** Z wykresów zostały wykluczone wartości skrajne, by zwiększyć jego przejrzystość. Możemy zauważyć, że ilość dni w miesiącu z czasem rozmów wyższym od średniej zaczyna wzrastać tuż przed wakacjami oraz w okresie od końca wakacji do końca roku. W miesiącach wakacyjnych czas ten jest bardzo zbliżony do średniej rocznej. Początek nowego roku to czas, kiedy rozmowy są dosyć często lekko poniżej średniej. 
+
+## Zadanie 5
+
+Czy jest zależnośc pomiędzy wiekiem klientów a ich średnim rocznym saldzie w euro w podziale na stopień wykształcenia?
+
+
+```{r zadanie 5, message=FALSE}
+
+df  %>% 
+  filter(balance<80000) %>% 
+  mutate(education=factor(education,levels=c("primary", "unknown", "secondary", "tertiary"))) %>% 
+  ggplot(aes(x=age,y=balance,color=education))+
+  geom_point(size=1.5,shape="o") +
+  facet_wrap(~education)+
+  scale_x_continuous(breaks=seq(20,90,by=10))+
+  labs(title = "Relationship between the age and the average yearly balance of the customers \n broken down by education",
+       x = "Age",
+       y = "Average yearly balance, in euros",
+       color = "Education") +
+  theme_minimal()+ 
+  theme(plot.title = element_text(hjust=0.5))
+  
+```
+
+**Komentarz:** Wiek klienta i jego wyształcenie ma znaczący wpływ na jego średnie roczne saldo. Największe saldo dodatnie na koncie mają ludzie z wykształceniem wyższym a następnie z średnim. Posiadanie wykształcenia wyższego częściej owocuje posiadaniem większych środków na koncie w młodym wieku. Przed 30 rokiem życia następuje wzrost środków na koncie, co może wiązać się z rozpoczęciem regularnie dobrej pracy. Znaczny spadek można zaobserwować w okolicach 60 roku życia, czyli przejścia na emeryturę.
+
+## Zadanie 6
+Rozważmy osoby, które są bezrobotne albo ich zawód jest nieznany. Czy procent osób, które są bezrobotne i nie spłacają kredytu jest większy od procenta osób o nieznanym zawodzie i nie spłacanym kredycie? Jaki typ kredytu jest (przez te osoby) najczęściej niespłacany? 
+
+```{r zadanie 6, message=FALSE}
+ods_unem<-df %>% filter(job=="unemployed" & default=="yes") %>% nrow()/df %>% filter(job=="unemployed") %>% nrow()
+ods_unkn<-df %>% filter(job=="unknown" & default=="yes") %>% nrow()/df %>% filter(job=="unknown") %>% nrow()
+
+#Tworzymy dataframe z odsetkiem osób
+df_help <- data.frame(
+  Group = c("Unemployed", "Unknown occupation"),
+  DefaultRate = c(ods_unem, ods_unkn)
+)
+
+ggplot(df_help, aes(x = Group, y = DefaultRate, fill = Group)) +
+  geom_col(width = 0.5, show.legend = FALSE) +
+  scale_y_continuous(labels = scales::percent_format()) + 
+  labs(title = "Percentage of customers not repaying their loan",
+       x = "Job",
+       y = "Percentage of customers not repaying their loan") +
+  theme_minimal()
+
+df %>% 
+  filter(job=="unemployed"|job=="unknown") %>% 
+  filter(default=="yes") %>% 
+  mutate(typ=case_when(
+    housing=="yes"&loan=="yes"~"Both",
+    housing=="yes"~"Housing loan",
+    loan=="yes"~"Personal loan",
+    TRUE~"Other"
+  )) %>% 
+  ggplot(aes(x=job,fill=typ))+
+  geom_bar()+
+  scale_y_continuous(expand=c(0,0))+
+  labs(title = "Analysis of the types of loans that are not being repayed by \n the unemployed and of unknown job",
+       x = "Job",
+       y = "Number of people",
+       fill = "Loan type") +
+  theme_light()+ 
+  theme(plot.title = element_text(hjust=0.5))
+
+```
+
+**Komentarz:** Procent osób niespłacających kredytu jest wyższy wsród bezrobotnych. Najczęściej nie spłacają one kredytu mieszkaniowego.
