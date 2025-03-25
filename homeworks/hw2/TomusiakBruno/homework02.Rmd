@@ -1,6 +1,6 @@
 ---
 title: "Praca domowa 2"
-author: "Imię Nazwisko - PROSZĘ UZUPEŁNIĆ"
+author: "Bruno Tomusiak"
 output: 
   html_document:
     toc: true
@@ -14,6 +14,8 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 library(dplyr)
 library(ggplot2)
+library(tidyr)
+library(tidyverse)
 
 ### Wczytanie danych
 df <- read.csv("dane.csv")
@@ -51,11 +53,29 @@ Weźmy pod uwagę zawody (`job`) klientów banku. Który zawód zacząco wyróż
 
 ```{r zadanie 1, message=FALSE}
 
-# Tu umieść kod do wygenerowania odpowiedzi do zadania.
+df %>% 
+  select(c(job,housing,loan)) %>% 
+  group_by(job) %>% 
+  summarise(
+    housing_c = sum(housing == 'yes', na.rm = TRUE),
+    loan_c = sum(loan == 'yes', na.rm = TRUE)
+  ) %>%
+  pivot_longer(cols = c(housing_c,loan_c)) -> z1_data
+
+
+z1_data %>% 
+  ggplot(aes(x=job,y=value, fill = name))+
+  geom_bar(stat = 'identity', position = position_dodge(width = 5), width = 4)+
+  facet_wrap(~job)+
+  labs(title = 'Loan/Housing and Jobs comparison',
+       x = NULL,
+       y = 'Value')+
+  scale_x_discrete(labels = NULL)+
+  theme_minimal()
 
 ```
 
-**Komentarz:**
+**Komentarz: Na tle wszystkich zawodów zdecydowanie wyróżnia się zawód - pracownik fizyczny (blue collar) warte uwagi są również zawody: technik, oraz kierownictwo**
 
 ## Zadanie 2
 
@@ -64,11 +84,17 @@ Wybierając klientów, którzy mają nieznany sposób kontaktu (`contact`). Jak 
 
 ```{r zadanie 2, message=FALSE}
 
-# Tu umieść kod do wygenerowania odpowiedzi do zadania.
+df %>% 
+  filter(contact == 'unknown') %>% 
+  select(c(age, marital)) %>% 
+  pivot_longer(cols = marital) %>% 
+  ggplot(aes(x = age, fill = name))+
+  geom_density()+
+  facet_wrap(~value)
 
 ```
 
-**Komentarz:**
+**Komentarz: widać, że najwięcej singli jest w wieku około 30 lat, a potem ich liczba drastycznie maleje,pozostałe dwa rozkłady są dosyć do siebie podobne**
 
 ## Zadanie 3
 
@@ -76,22 +102,36 @@ Jaka jest różnica pomiędzy średnim rocznym saldem w euro w zależności od w
 
 ```{r zadanie 3, message=FALSE}
 
-# Tu umieść kod do wygenerowania odpowiedzi do zadania.
+df %>% 
+  select(c(education,default,balance))%>% 
+  group_by(education,default) %>% 
+  summarise(avg = mean(balance)) %>% 
+  ggplot(aes(x = education,y = avg, fill = education ))+
+  geom_bar(stat = 'identity')+
+  facet_wrap(~default)+
+  scale_x_discrete(labels = NULL)
 
 ```
 
-**Komentarz:**
+**Komentarz: widać, że osoby, które nie spłacają kredytu mają ujemne saldo, niezależnie od wykształcenia.W drugiej grupie nie ma znaczących różnic**
 
 ## Zadanie 4
 
 Czy dzień i miesiąc kontaktu z klientem ma wpływ na średni czas trwania rozmowy w stosunku do średniego czasu trwania rozmowy?
 ```{r zadanie 4, message=FALSE}
 
-# Tu umieść kod do wygenerowania odpowiedzi do zadania.
+df %>% 
+  select(day, month,duration) %>% 
+  group_by(day, month) %>% 
+  summarise(avg_Duration = mean(duration, na.rm = TRUE)) %>% 
+  ggplot(aes(x = day,y = avg_Duration))+
+  geom_bar(stat = 'identity')+
+  geom_hline(yintercept = mean(df$duration), linetype = "dashed", color = "red")+
+  facet_wrap(~month)
 
 ```
 
-**Komentarz:**
+**Komentarz: z reguły rozkład jest równomierny, jedynie trzy miesiące mają znaczący wzrot w pewnym dniu. Czerwona linia oznacza średnią!**
 
 ## Zadanie 5
 
@@ -100,19 +140,49 @@ Czy jest zależnośc pomiędzy wiekiem klientów a ich średnim rocznym saldzie 
 
 ```{r zadanie 5, message=FALSE}
 
-# Tu umieść kod do wygenerowania odpowiedzi do zadania.
+df %>% 
+  select(age, balance, education) %>%
+  group_by(age, education) %>% 
+  summarise(avg_balance = mean(balance)) %>% 
+  ggplot(aes(x = age, y = avg_balance))+
+  geom_col()+
+  facet_wrap(~education)+
+  ylim(0,10000)
 
 ```
 
-**Komentarz:**
+**Komentarz: po eleminacji obserwacji, która znacząco odstawała od reszty, co sugeruje niepoprawność danych tendencja jest wówczas rosnąca, wraz z wiekiem wzrasta średnie roczne saldo**
 
 ## Zadanie 6
 Rozważmy osoby, które są bezrobotne albo ich zawód jest nieznany. Czy procent osób, które są bezrobotne i nie spłacają kredytu jest większy od procenta osób o nieznanym zawodzie i nie spłacanym kredycie? Jaki typ kredytu jest (przez te osoby) najczęściej niespłacany? 
 
 ```{r zadanie 6, message=FALSE}
 
-# Tu umieść kod do wygenerowania odpowiedzi do zadania.
+df %>% 
+  filter(job %in% c('unknown', 'unemployed')) %>% 
+  select(job, default, loan, housing) %>% 
+  group_by(job) %>% 
+  summarise(splacany = 100*mean(default == 'yes')) %>% 
+  ggplot(aes(x = job, y = splacany))+
+  geom_col()
+
+df %>% 
+  filter(job %in% c('unknown', 'unemployed')) %>% 
+  select(job, default, loan, housing) %>% 
+  filter(default == 'yes') %>%
+  group_by(job) %>% 
+  mutate(rodzaj_kredytu = case_when(
+    housing == 'yes'& loan == 'yes' ~ 'mieszkaniowy+osobisty',
+    housing == 'yes' ~ 'mieszkaniowy',
+    loan == 'yes' ~ 'osobisty',
+    TRUE ~ 'brak'
+  )) %>% 
+  ggplot(aes(x = rodzaj_kredytu, fill = rodzaj_kredytu))+
+  geom_bar()+
+  facet_wrap(~job)+
+  theme_minimal()+
+  scale_x_discrete(labels = NULL)
 
 ```
 
-**Komentarz:**
+**Komentarz: procent bezrobotnych, którzy nie spłacają kredytu jest większy od drugiej rozważanej grupy zawodowej. Bezrobotni najczęściej nie spłacają kredytu mieszkaniowego, u drugiej grupy występują tylko dwa rodzaje na takim samym poziomie**
