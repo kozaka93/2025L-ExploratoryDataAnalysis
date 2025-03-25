@@ -1,0 +1,161 @@
+---
+title: "Praca domowa 2"
+author: "Filip Kowalczyk"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+    theme: united
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+library(patchwork)
+
+### Wczytanie danych
+df <- read.csv("dane.csv")
+
+```
+
+## Dane 
+Dane wykorzystane w Pracy domowej 2 są związane z kampaniami marketingu bezpośredniego portugalskiej instytucji bankowej. Kampanie marketingowe opierały się na rozmowach telefonicznych. Często wymagany był więcej niż jeden kontakt z tym samym klientem, aby uzyskać dostęp do tego, czy produkt (lokata bankowa) zostanie (lub nie) subskrybowany. Opis wszystkich kolumn znajduje się również w pliku `README.md`.
+
+#### Dane klienta banku
+|Zmienna|Opis|
+|-|-|
+| **age**| wiek|
+|**job** : admin., unknown, unemployed, management, housemaid, entrepreneur, student, blue-collar, self-employed, retired, technician, services|	administrator, nieznany, bezrobotny, kierownictwo, pokojówka, przedsiębiorca, student, pracownik fizyczny, samozatrudniony, emeryt, technik, usługi|
+|**marital** : married, divorced, single; note: divorced means divorced or widowed)|żonaty/zamężna, rozwiedzion_, kawaler/panna; uwaga: rozwiedzion_ oznacza rozwiedzion_ lub owdowiał_|
+|**education** : unknown, secondary, primary, tertiary| nieznane, średnie, podstawowe, wyższe|
+|**default** : yes, no | czy kredyt jest niespłacany : tak, nie|
+|**balance** : average yearly balance, in euros| średnie roczne saldo w euro|
+|**housing** : has housing loan? yes, no |czy posiada kredyt mieszkaniowy? tak, nie|
+|**loan** : has personal loan? yes, no | ma pożyczkę osobistą? tak, nie|
+
+#### Dane związane z ostatnim kontaktem w bieżącej kampanii
+|Zmienna|Opis|
+|-|-|
+|**contact** : unknown, telephone, cellular| nieznany, telefon, komórkowy|
+|**day** : last contact day of the month | dzień miesiąca ostatniego kontaktu|
+|**month** : last contact month of year, jan, feb, mar, ..., nov, dec | miesiąc ostatniego kontaktu w roku, styczeń, luty, marzec, ..., listopad, grudzień|
+|**duration** : last contact duration, in seconds |czas trwania ostatniego kontaktu w sekundach|
+
+
+## Zadanie 1
+
+Weźmy pod uwagę zawody (`job`) klientów banku. Który zawód zacząco wyróżnia się w posiadaniu kredytu mieszkaniowego lub pożyczki osobistej?
+
+
+```{r zadanie 1, message=FALSE}
+
+t1<-df %>% 
+  filter(housing=="yes") %>% 
+  group_by(job) %>% 
+  summarise(n=n())
+p1<-ggplot(t1,aes(x=job,y=n))+geom_col()
+
+t2<-df %>% 
+  filter(loan=="yes") %>% 
+  group_by(job) %>% 
+  summarise(n=n())
+p2<-ggplot(t2,aes(x=job,y=n))+geom_col()
+
+p1+p2
+```
+
+**Komentarz:**
+W posiadaniu kredytu jak i pożyczki znacząco wyróżnia się blue-collar, co w uwzględnieniu sumarycznego rozkładu przełożyłoby się na jeszcze wyraźniejszą różnicę.
+
+## Zadanie 2
+
+Wybierając klientów, którzy mają nieznany sposób kontaktu (`contact`). Jak rozkłada się ich wiek w podziale na status związku?
+
+
+```{r zadanie 2, message=FALSE}
+
+t11<-df %>% 
+  filter(contact=="unknown") 
+p11<-ggplot(t11,aes(x=marital,y=age))+geom_boxplot()
+p11
+
+```
+
+**Komentarz:**
+Pośród tych klientów najmłodsi okazali się single, potem poślubieni, a najstarsi rozwiedzeni.
+
+## Zadanie 3
+
+Jaka jest różnica pomiędzy średnim rocznym saldem w euro w zależności od wykształcenia i tego czy kredyt jest niespłacany?
+
+```{r zadanie 3, message=FALSE}
+
+t111<-df %>% 
+  group_by(education) %>% 
+  mutate(m=mean(balance),n0=n()) %>% 
+  select(m,education,default,n0,balance)
+p111<-ggplot(t111,aes(x=education,y=m/n0))+geom_col()+facet_wrap(~default)+labs(y="balance mean")
+p111
+```
+
+**Komentarz:**
+Średnie roczne saldo niezależnie od wykształcenia jest znacznie wyższe u ludzi z niespłacanym kredytem.
+
+## Zadanie 4
+
+Czy dzień i miesiąc kontaktu z klientem ma wpływ na średni czas trwania rozmowy w stosunku do średniego czasu trwania rozmowy?
+```{r zadanie 4, message=FALSE}
+
+t1111<-df %>% 
+  select(day,month,duration) %>% 
+  group_by(day,month) %>% 
+  mutate(n=mean(duration))
+p1111<-ggplot(t1111, aes(x=day,y=month, fill=n))+geom_tile()
+p1111
+```
+
+**Komentarz:**
+W sumie to nie.
+
+## Zadanie 5
+
+Czy jest zależnośc pomiędzy wiekiem klientów a ich średnim rocznym saldzie w euro w podziale na stopień wykształcenia?
+
+
+```{r zadanie 5, message=FALSE}
+
+ggplot(df, aes(x=age,y=balance))+geom_point()+facet_wrap(~education)
+
+```
+
+**Komentarz:**
+Dla primary i unknown rozkład zarobków względem wieku jest całkiem równomierny, w przypadku tertiary i secondary często dla wieku 30-60 mamy relatywnie więcej przypadków wyższego salda.
+
+## Zadanie 6
+Rozważmy osoby, które są bezrobotne albo ich zawód jest nieznany. Czy procent osób, które są bezrobotne i nie spłacają kredytu jest większy od procenta osób o nieznanym zawodzie i nie spłacanym kredycie? Jaki typ kredytu jest (przez te osoby) najczęściej niespłacany? 
+
+```{r zadanie 6, message=FALSE}
+z6<-df %>% 
+  filter(job=="unemployed"|job=="unknown") %>% 
+  select(job,default)
+
+a<-z6 %>% filter(job=="unemployed") %>% nrow()
+b<-z6 %>% filter(job=="unemployed") %>%filter(default=="yes") %>% nrow()  
+c<-z6 %>% filter(job=="unknown") %>% nrow()
+d<-z6 %>% filter(job=="unknown") %>%filter(default=="yes") %>% nrow() 
+
+b/a>d/c
+
+z61<-df %>% filter(job=="unemployed"|job=="unknown") %>% filter(default=="yes") %>% group_by(housing,loan) %>% summarise(n=n())
+
+z61
+# Tu umieść kod do wygenerowania odpowiedzi do zadania.
+
+```
+
+**Komentarz:**
+1. Tak
+2. Nie wiem czy dobrze zrozumiałem polecenie, ale wychodzi na to, że najczęściej niespłacany jest housing. 
