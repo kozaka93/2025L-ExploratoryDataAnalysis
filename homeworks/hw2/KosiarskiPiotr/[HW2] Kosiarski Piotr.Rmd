@@ -1,0 +1,197 @@
+---
+title: "Praca domowa 2"
+author: "Imię Nazwisko - Piotr Kosiarski"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+    theme: united
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(patchwork)
+
+### Wczytanie danych
+df <- read.csv("dane.csv")
+
+```
+
+## Dane
+
+Dane wykorzystane w Pracy domowej 2 są związane z kampaniami marketingu bezpośredniego portugalskiej instytucji bankowej. Kampanie marketingowe opierały się na rozmowach telefonicznych. Często wymagany był więcej niż jeden kontakt z tym samym klientem, aby uzyskać dostęp do tego, czy produkt (lokata bankowa) zostanie (lub nie) subskrybowany. Opis wszystkich kolumn znajduje się również w pliku `README.md`.
+
+#### Dane klienta banku
+
+| Zmienna                                                                                                                                        | Opis                                                                                                                                                |
+|------------------------------------|------------------------------------|
+| **age**                                                                                                                                        | wiek                                                                                                                                                |
+| **job** : admin., unknown, unemployed, management, housemaid, entrepreneur, student, blue-collar, self-employed, retired, technician, services | administrator, nieznany, bezrobotny, kierownictwo, pokojówka, przedsiębiorca, student, pracownik fizyczny, samozatrudniony, emeryt, technik, usługi |
+| **marital** : married, divorced, single; note: divorced means divorced or widowed)                                                             | żonaty/zamężna, rozwiedzion\_, kawaler/panna; uwaga: rozwiedzion\_ oznacza rozwiedzion\_ lub owdowiał\_                                             |
+| **education** : unknown, secondary, primary, tertiary                                                                                          | nieznane, średnie, podstawowe, wyższe                                                                                                               |
+| **default** : yes, no                                                                                                                          | czy kredyt jest niespłacany : tak, nie                                                                                                              |
+| **balance** : average yearly balance, in euros                                                                                                 | średnie roczne saldo w euro                                                                                                                         |
+| **housing** : has housing loan? yes, no                                                                                                        | czy posiada kredyt mieszkaniowy? tak, nie                                                                                                           |
+| **loan** : has personal loan? yes, no                                                                                                          | ma pożyczkę osobistą? tak, nie                                                                                                                      |
+
+#### Dane związane z ostatnim kontaktem w bieżącej kampanii
+
+| Zmienna                                                              | Opis                                                                               |
+|------------------------------------|------------------------------------|
+| **contact** : unknown, telephone, cellular                           | nieznany, telefon, komórkowy                                                       |
+| **day** : last contact day of the month                              | dzień miesiąca ostatniego kontaktu                                                 |
+| **month** : last contact month of year, jan, feb, mar, ..., nov, dec | miesiąc ostatniego kontaktu w roku, styczeń, luty, marzec, ..., listopad, grudzień |
+| **duration** : last contact duration, in seconds                     | czas trwania ostatniego kontaktu w sekundach                                       |
+
+## Zadanie 1
+
+Weźmy pod uwagę zawody (`job`) klientów banku. Który zawód zacząco wyróżnia się w posiadaniu kredytu mieszkaniowego lub pożyczki osobistej?
+
+```{r zadanie 1, message=FALSE}
+
+df %>% 
+  filter(loan == "yes"|housing == "yes") %>% 
+  group_by(job) %>% 
+  summarise(ile = n()) %>% 
+  ggplot(aes(y = job, x = ile)) + geom_col() + 
+  labs(x = "Ilość osób posiadających pożyczkę osobistą lub kredyt mieszkaniowy",
+       y = "Zawód", title = "Liczba osób posiadających pożyczkę w zależności od zawodu") + scale_x_continuous(expand = c(0,0))
+```
+
+**Komentarz:**
+W posiadaniu kredytu mieszkaniowego lub pożyczki osobistej znacząco wyrózniają  się osoby wykonujące prace "blue-collar".
+
+## Zadanie 2
+
+Wybierając klientów, którzy mają nieznany sposób kontaktu (`contact`). Jak rozkłada się ich wiek w podziale na status związku?
+
+```{r zadanie 2, message=FALSE}
+
+# Tu umieść kod do wygenerowania odpowiedzi do zadania.
+df %>% 
+  filter(contact == "unknown") %>% 
+  ggplot(aes(x = age, y = marital))+geom_boxplot()+
+  labs(y = "Status związku", x = "Wiek", 
+       title = "Rozkład wieku w podziale na status związku",
+       subtitle = "Dla klientów, którzy mają nieznany sposób kontaktu")
+```
+
+**Komentarz:**
+Średnio najmłodsze osoby są najczęściej singlami,za to zazwyczaj osoby w wieku średnim są albo w związku małżeńskim albo są rozwodnikami. Jednakże można zauważyc tendencje, że im starsze osoby tym częsciej są po rozwodzie.
+
+## Zadanie 3
+
+Jaka jest różnica pomiędzy średnim rocznym saldem w euro w zależności od wykształcenia i tego czy kredyt jest niespłacany?
+
+```{r zadanie 3, message=FALSE}
+
+# Tu umieść kod do wygenerowania odpowiedzi do zadania.
+df %>%
+  group_by(education, default) %>% 
+  summarise(mean_balance = mean(balance)) %>% 
+  ggplot(aes(x = education, y = mean_balance, fill = default))+
+  geom_col(position = "dodge")+ 
+  labs(title = "Średnie roczne saldo",
+       subtitle = "W zależności od edukacji i spłaconego kredytu",
+       x = "Edukacja", y = "Średnie saldo")
+```
+
+**Komentarz:**
+Osoby, których kredyt jest niespłacany mają średnio dużo niższe roczne saldo niż osoby których kredyt jest spłacany. Dodatkowo, osoby z wykształceniem wyższym, które spłacają kredyt zarabiają średnio najwięcej.
+
+## Zadanie 4
+
+Czy dzień i miesiąc kontaktu z klientem ma wpływ na średni czas trwania rozmowy w stosunku do średniego czasu trwania rozmowy?
+
+```{r zadanie 4, message=FALSE}
+
+# Tu umieść kod do wygenerowania odpowiedzi do zadania.
+allmean <- mean(df$duration)
+
+df %>%
+  group_by(month,day) %>% 
+  summarise(mean_dur = mean(duration)/allmean) %>%
+  ggplot(aes(x = day, y = mean_dur))+ geom_col()+ 
+  facet_wrap(~month, scales = "fixed") +
+  labs(title = "Wpływ dnia i miesiąca na długość rozmowy") +
+  scale_y_continuous(expand = c(0,0)) + 
+  labs(y = "Długość rozmowy", x = "Dzień miesiąca")
+
+
+```
+
+**Komentarz:**
+Są czasami lekkie odchylenia, ale w większości średni czas trwania rozmów jest mniej więcej równy i nie jest zależny od dnia i miesiąca.
+
+## Zadanie 5
+
+Czy jest zależnośc pomiędzy wiekiem klientów a ich średnim rocznym saldzie w euro w podziale na stopień wykształcenia?
+
+```{r zadanie 5, message=FALSE}
+
+# Tu umieść kod do wygenerowania odpowiedzi do zadania.
+df %>%
+  mutate(gw = case_when(age < 10 ~ '[0,10)',
+                        age < 20 ~ '[10,20)',
+                        age < 30 ~ '[20,30)',
+                        age < 40 ~ '[30,40)',
+                        age < 50 ~ '[40,50)',
+                        age < 60 ~ '[50,60)',
+                        age < 70 ~ '[60,70)',
+                        age < 80 ~ '[70,80)',
+                        TRUE~ '[80,oo)') )%>%
+  group_by(gw, education) %>% 
+  summarise(msal =mean(balance)) %>% 
+  ggplot(aes(y = msal, x = gw))+
+  geom_col()+facet_wrap(~education, scales = "fixed")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous(expand = c(0,0))+
+  labs(title = "Zależność między wiekiem, a rocznym saldzie",
+                     y = "Średnie saldo roczne",x = "Wiek")
+
+
+```
+
+**Komentarz:**
+Widać, że niezależnie od wykształcenia średnio ludzie starsi zarabiają więcej niż młodzi.
+
+## Zadanie 6
+
+Rozważmy osoby, które są bezrobotne albo ich zawód jest nieznany. Czy procent osób, które są bezrobotne i nie spłacają kredytu jest większy od procenta osób o nieznanym zawodzie i nie spłacanym kredycie? Jaki typ kredytu jest (przez te osoby) najczęściej niespłacany?
+
+```{r zadanie 6, message=FALSE}
+
+# Tu umieść kod do wygenerowania odpowiedzi do zadania.
+new_df <- df %>% 
+  filter(job %in% c("unknown","unemployed"))
+
+plot1 <- new_df %>%
+  group_by(job) %>% 
+  summarise(number = 100 * sum(default=="yes")/n()) %>% 
+  ggplot(aes(x=job, y=number))+geom_col()+
+  labs(x = "Zawód",
+       y = "Procent osób nie spłacających kredytu",
+       title ="Procent osób nie spłacających kredytu",
+       subtitle="Osoby bezrobotne i o nieznanym zawodzie")+
+  scale_y_continuous(expand = c(0,0))
+  
+plot2 <- new_df %>% 
+  group_by(default) %>% 
+  summarise(housing = sum(housing=="yes"), loan = sum(loan == "yes")) %>%
+  pivot_longer(cols = c("housing","loan"), names_to = "katego", values_to = "pozycz") %>% 
+  filter(default == "yes") %>% 
+  ggplot(aes(x = katego, y = pozycz) )+geom_col()+
+  labs(x = "Kategoria pożyczki", y = "Ilość osób niespłacających pożyczek",
+       title = "Kategoria pożyczek, a niespłacanie ich")+
+  scale_y_continuous(expand = c(0,0))
+
+plot1 + plot2
+```
+
+**Komentarz:**
+Czy procent osób, które są bezrobotne i nie spłacają kredytu jest większy od procenta osób o nieznanym zawodzie i nie spłacanym kredycie? Tak
+Jaki typ kredytu jest (przez te osoby) najczęściej niespłacany? Kredyt mieszkaniowy
