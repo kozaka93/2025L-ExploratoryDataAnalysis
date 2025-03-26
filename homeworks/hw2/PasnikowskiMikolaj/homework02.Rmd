@@ -1,0 +1,212 @@
+---
+title: "Praca domowa 2"
+author: "Mikołaj Paśnikowski"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+    theme: united
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+
+### Wczytanie danych
+df <- read.csv("dane.csv")
+
+```
+
+## Dane = 
+Dane wykorzystane w Pracy domowej 2 są związane z kampaniami marketingu bezpośredniego portugalskiej instytucji bankowej. Kampanie marketingowe opierały się na rozmowach telefonicznych. Często wymagany był więcej niż jeden kontakt z tym samym klientem, aby uzyskać dostęp do tego, czy produkt (lokata bankowa) zostanie (lub nie) subskrybowany. Opis wszystkich kolumn znajduje się również w pliku `README.md`.
+
+#### Dane klienta banku
+|Zmienna|Opis|
+|-|-|
+| **age**| wiek|
+|**job** : admin., unknown, unemployed, management, housemaid, entrepreneur, student, blue-collar, self-employed, retired, technician, services|	administrator, nieznany, bezrobotny, kierownictwo, pokojówka, przedsiębiorca, student, pracownik fizyczny, samozatrudniony, emeryt, technik, usługi|
+|**marital** : married, divorced, single; note: divorced means divorced or widowed)|żonaty/zamężna, rozwiedzion_, kawaler/panna; uwaga: rozwiedzion_ oznacza rozwiedzion_ lub owdowiał_|
+|**education** : unknown, secondary, primary, tertiary| nieznane, średnie, podstawowe, wyższe|
+|**default** : yes, no | czy kredyt jest niespłacany : tak, nie|
+|**balance** : average yearly balance, in euros| średnie roczne saldo w euro|
+|**housing** : has housing loan? yes, no |czy posiada kredyt mieszkaniowy? tak, nie|
+|**loan** : has personal loan? yes, no | ma pożyczkę osobistą? tak, nie|
+
+#### Dane związane z ostatnim kontaktem w bieżącej kampanii
+|Zmienna|Opis|
+|-|-|
+|**contact** : unknown, telephone, cellular| nieznany, telefon, komórkowy|
+|**day** : last contact day of the month | dzień miesiąca ostatniego kontaktu|
+|**month** : last contact month of year, jan, feb, mar, ..., nov, dec | miesiąc ostatniego kontaktu w roku, styczeń, luty, marzec, ..., listopad, grudzień|
+|**duration** : last contact duration, in seconds |czas trwania ostatniego kontaktu w sekundach|
+
+
+## Zadanie 1
+
+Weźmy pod uwagę zawody (`job`) klientów banku. Który zawód zacząco wyróżnia się w posiadaniu kredytu mieszkaniowego lub pożyczki osobistej?
+
+
+```{r zadanie 1, message=FALSE}
+
+plot1 <- df %>% 
+  mutate(km_lub_po = housing == "yes" | loan == "yes") %>% 
+  select(job, km_lub_po) %>% 
+  group_by(job) %>% 
+  summarize(n = n()) %>% 
+  as.data.frame() %>% 
+  ggplot(aes(y = job, x = n)) +
+  geom_col()
+plot1
+
+```
+
+**Komentarz:**
+Z wykresu widać, że w posiadaniu kredytu mieszkaniowego lub pożyczki osobistej najbardziej wyróżnia się zawód blue collar (pracownik fizyczny) oraz, zaraz za nim, management.
+## Zadanie 2
+
+Wybierając klientów, którzy mają nieznany sposób kontaktu (`contact`). Jak rozkłada się ich wiek w podziale na status związku?
+
+
+```{r zadanie 2, message=FALSE}
+
+plot2 <- df %>% 
+  filter(contact == 'unknown') %>% 
+  select(marital, age) %>% 
+  group_by(marital, age) %>% 
+  ggplot(aes(x = age, fill = marital)) +
+  geom_histogram(position = "identity", alpha = 0.5, bins = 42)
+plot2
+
+
+```
+
+**Komentarz:** 
+Rozkład taki, jak na wykresie; widzimy, że przeważają ludzie żonaci/zamężni, których najwięcej jest w okolicach 40-stki, wśród osób przed 30-stką natomiast najwięcej jest singli (najwięcej również w okolicach 30 lat), natomiast rozwiedzionych/owdowiałych jest relatywnie mało i ich rozkład jest ~jednostajny od ok. 35 r. ż.
+
+## Zadanie 3
+
+Jaka jest różnica pomiędzy średnim rocznym saldem w euro w zależności od wykształcenia i tego czy kredyt jest niespłacany?
+
+```{r zadanie 3, message=FALSE}
+
+plot3 <- df %>% 
+  select(education, default, balance) %>% 
+  group_by(education, default) %>% 
+  summarise(sr_r_saldo = mean(balance, na.rm = TRUE), .groups = "drop") %>% 
+  ggplot(aes(x = education, y = sr_r_saldo, fill = default)) +
+  geom_col(position = "dodge")
+
+plot3
+```
+
+**Komentarz:** 
+Niezależnie od wykształcenia, osoby spłacające kredyt (kredyt nie jest niespłacany, default == no) mają dodatnie średnie roczne saldo w okolicach 1250-1750 euro, natomiast osoby niespłacające kredytu mają ujemne i dużo mniejsze średnie roczne saldo, przy czym największe saldo mają osoby z wykształceniem wyższym spłacające kredyt.
+
+## Zadanie 4
+
+Czy dzień i miesiąc kontaktu z klientem ma wpływ na średni czas trwania rozmowy w stosunku do średniego czasu trwania rozmowy?
+```{r zadanie 4, message=FALSE}
+
+plot4 <- df %>% 
+  mutate(month = factor(month, levels = c("jan", "feb", "mar", "apr", "may", "jun", 
+                                          "jul", "aug", "sep", "oct", "nov", "dec"))) %>% 
+  group_by(day,month) %>% 
+  summarise(sr_dzienna = mean(duration), .groups = "drop") %>%
+  ggplot(aes(x = day, y = sr_dzienna)) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~month, ncol = 4) +
+  theme_minimal()
+
+
+plot4
+  
+
+```
+
+**Komentarz:**
+Przez większość dni w roku średni czas trwania rozmowy jest podobny, choć w niektórych miesiącach widzimy więcej przerw (np. styczeń) i występują pojedyncze dni w roku, w których śr. czas jest dużo większy. A więc przeważnie dzień i miesiąc nie mają wpływu, natomiast to zależy od konkretnego dnia.
+
+## Zadanie 5
+
+Czy jest zależnośc pomiędzy wiekiem klientów a ich średnim rocznym saldzie w euro w podziale na stopień wykształcenia?
+
+
+```{r zadanie 5, message=FALSE}
+
+plot5 <- df %>% 
+  group_by(education, age) %>% 
+  #distinct(education, age, balance) %>% 
+  summarise(sr_saldo = mean(balance)) %>%
+  ggplot(aes(x = age, y = sr_saldo)) +
+  geom_col(stat = "identity") +
+  facet_wrap(~education, ncol = 4) +
+  theme_minimal()
+plot5  
+
+# temp <- df %>% 
+#   filter(education == 'secondary') %>% 
+#   select(age, balance) %>% 
+#   filter(age > 75)
+# View(temp)
+# 
+# temp2 <- df %>% 
+#   filter(education == 'secondary', age == 84) 
+```
+
+**Komentarz:**
+(przez zarabianie mam na myśli w uproszczeniu śr. saldo pod koniec roku)
+Dla każdego stopnia wykształcenia widać, że zarobki są mniejsze i podobne do 50 r. ż, z czego w grupie z wykształceniem wyższym są wyraźnie wyższe. Natomiast osoby w średnim i starszym wieku zarabiają wyraźnie więcej, choć ich zarobki się mogą znacząco między sobą różnić, szczególnie w grupie z wykształceniem wyższym. 
+W oczy rzuca się jeszcze przypadek 84-latka bogacza, który dodatkowo jest powielony w danych, pewnie wskutek błędu* (sprawdzałem to w temp, temp2), który znacząco zawyża średnią wśród (całych trzech) 84-latków z wykształceniem średnim.
+
+*lub w ramach specyficznego żartu na prima aprilis
+
+## Zadanie 6
+Rozważmy osoby, które są bezrobotne albo ich zawód jest nieznany. Czy procent osób, które są bezrobotne i nie spłacają kredytu jest większy od procenta osób o nieznanym zawodzie i nie spłacanym kredycie? Jaki typ kredytu jest (przez te osoby) najczęściej niespłacany? 
+
+```{r zadanie 6, message=FALSE}
+zad6 <- df %>% 
+  filter(job %in% c('unemployed','unknown'))
+
+lacznie <- nrow(zad6)
+
+bezrobotne_niesplacaja <- zad6 %>% 
+  filter(job == 'unemployed', default == 'yes') 
+  
+
+bezrobotne_niesplacaja %>% 
+  summarise(mieszkaniowy = sum(housing == 'yes'), osobisty = sum(loan == 'yes')) %>% 
+  which.max() #odp. na pyt. 2 (1/2)
+
+n1 <- bezrobotne_niesplacaja %>% 
+  summarise(n = n()) %>%
+  pull(n)
+  
+
+nieznane_niesplacaja <- zad6 %>% 
+  filter(job == 'unknown', default == 'yes') 
+  
+
+nieznane_niesplacaja %>% 
+  summarise(mieszkaniowy = sum(housing == 'yes'), osobisty = sum(loan == 'yes')) %>% 
+  which.max() #odp. na pyt. 2 (2/2)
+
+n2 <- nieznane_niesplacaja %>% 
+  summarise(n = n()) %>%
+  pull(n)
+  
+n1 <- n1 / lacznie * 100
+n2 <- n2 / lacznie * 100
+n1>n2 #odp na pyt. 1.
+
+  
+  
+```
+
+**Komentarz:**
+(Tak,) procent osób, które są bezrobotne i nie spłacają kredytu jest większy od procenta osób o nieznanym zawodzie i nie spłacanym kredycie, w obu grupach najczęściej niespłacany jest kredyt mieszkaniowy.
+
+PS: przepraszam, że tak późno przesyłam
+PS2: niektóre polecenia są zapisane w sposób niejednoznaczny, jeśli coś źle zinterpretowałem to proszę to wybaczyć
