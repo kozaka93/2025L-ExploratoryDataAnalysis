@@ -101,7 +101,7 @@ Wstęp do eksploracji danych składa się z:
     <td>01.kwi</td>
     <td>2</td>
     <td>lab</td>
-    <td>R: ggplot2 - zaawansowany oraz rozszerzenia: patchwork, ggrepel</td>
+    <td><a href="https://github.com/kozaka93/2025L-ExploratoryDataAnalysis/tree/main/labs/lab06">R: ggplot2 - zaawansowany oraz rozszerzenia: patchwork, ggrepel</a></td>
     <td></td>
   </tr>
   <tr>
