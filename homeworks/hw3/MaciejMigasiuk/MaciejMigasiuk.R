@@ -61,7 +61,6 @@ europe_data <- europe_map %>%
 
 colnames(europe_data)
 
-# Mapa z kolorem wg growth i tekstem wg growth_crime
 europe_mapa_final <- ggplot() +
   geom_polygon(data = europe_data, aes(x = long, y = lat, group = group, fill = growth), 
                color = "white") +
@@ -79,6 +78,5 @@ europe_mapa_final <- ggplot() +
         axis.text = element_blank(),
         axis.ticks = element_blank())
 
-# Wyświetl mapę
 europe_mapa_final
  
