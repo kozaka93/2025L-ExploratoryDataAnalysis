@@ -115,7 +115,7 @@ pie_chart <- ggplot(pie, aes(x = "", y = new, fill = Motor.energy)) +
   theme(legend.position = "bottom")
 
 grid.arrange(
-  top = textGrob("EU population and Car Energy Distribution in 2022", gp = gpar(fontsize = 16, fontface = "bold")),  # Title on top
+  top = textGrob("EU population and Car Energy Distribution in 2022", gp = gpar(fontsize = 16, fontface = "bold")), 
   pie_chart, 
   eu_data, 
   ncol = 2, 
