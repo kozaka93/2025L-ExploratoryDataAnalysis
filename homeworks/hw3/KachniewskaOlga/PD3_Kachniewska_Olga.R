@@ -8,8 +8,21 @@ library(leaflet)
 library(dplyr)
 library(shiny)
 
-#Źdródło danych
+#Źdródło danych i ich wczytanie
 #Dane pochodzą ze strony: https://ourworldindata.org/grapher/coffee-bean-production?tab=table
+# URL do pliku ZIP z danymi
+url <- "https://ourworldindata.org/grapher/coffee-bean-production.zip"
+# Ścieżka tymczasowa do zapisania ZIPa
+temp_zip <- tempfile(fileext = ".zip")
+# Pobranie pliku
+download.file(url, temp_zip, mode = "wb")
+# Rozpakowanie do katalogu tymczasowego
+temp_dir <- tempdir()
+unzip(temp_zip, exdir = temp_dir)
+# Znalezienie pliku CSV w wypakowanym katalogu
+csv_file <- list.files(temp_dir, pattern = "\\.csv$", full.names = TRUE)[1]
+# Wczytanie danych
+dane_kraje <- read.csv(csv_file)
 
 
 # Stworzenie aplikacji Shiny
@@ -47,9 +60,6 @@ server <- function(input, output, session) {
   
   # Pobranie danych o krajach
   kraje <- ne_countries(scale = "medium", returnclass = "sf")
-  
-  # Wczytanie danych o produkcji kawy
-  dane_kraje <- read.csv("coffee-bean-production.csv")
   
   # Zmiana nazw kolumn w danych
   dane_kraje <- dane_kraje %>%
@@ -107,8 +117,8 @@ app <- shinyApp(ui = ui, server = server)
 saveWidget(app, "coffee_world.html")
 
 
-#pojedyncza mapa do zapisania jako jpg ponieważ nic nie działa jak chciałam zapisać całość jako html
-# a po straceniu ponad godziny na próby nie zamierzam ich kontynuować
+#pojedyncza mapa do zapisania jako html ponieważ nic nie działa jak chciałam zapisać całość jako html
+# a po straceniu ponad godziny na próby nie wiem jak je kontynuować
 
 
 kraje <- ne_countries(scale = "medium", returnclass = "sf")
