@@ -1,0 +1,52 @@
+﻿state,1976,1980,1984,1988,1992,1996,2000,2004,2008,2012,2016,2020,2024,Liczba R,Liczba D,Suma
+alabama,D,R,R,R,R,R,R,R,R,R,R,R,R,12,1,11
+alaska,R,R,R,R,R,R,R,R,R,R,R,R,R,13,0,13
+arizona,R,R,R,R,R,D,R,R,R,R,R,D,R,11,2,9
+arkansas,D,R,R,R,D,D,R,R,R,R,R,R,R,10,3,7
+california,R,R,R,R,D,D,D,D,D,D,D,D,D,4,9,-5
+colorado,R,R,R,R,D,R,R,R,D,D,D,D,D,7,6,1
+connecticut,R,R,R,R,D,D,D,D,D,D,D,D,D,4,9,-5
+delaware,D,R,R,R,D,D,D,D,D,D,D,D,D,3,10,-7
+district of columbia,D,D,D,D,D,D,D,D,D,D,D,D,D,0,13,-13
+florida,D,R,R,R,R,D,R,R,D,D,R,R,R,9,4,5
+georgia,D,D,R,R,D,R,R,R,R,R,R,D,R,9,4,5
+hawaii,D,D,R,D,D,D,D,D,D,D,D,D,D,1,12,-11
+idaho,R,R,R,R,R,R,R,R,R,R,R,R,R,13,0,13
+illinois,R,R,R,R,D,D,D,D,D,D,D,D,D,4,9,-5
+indiana,R,R,R,R,R,R,R,R,D,R,R,R,R,12,1,11
+iowa,R,R,R,D,D,D,D,R,D,D,R,R,R,7,6,1
+kansas,R,R,R,R,R,R,R,R,R,R,R,R,R,13,0,13
+kentucky,D,R,R,R,D,D,R,R,R,R,R,R,R,10,3,7
+louisiana,D,R,R,R,D,D,R,R,R,R,R,R,R,10,3,7
+maine,R,R,R,R,D,D,D,D,D,D,D,D,D,4,9,-5
+maryland,D,D,R,R,D,D,D,D,D,D,D,D,D,2,11,-9
+massachusetts,D,R,R,D,D,D,D,D,D,D,D,D,D,2,11,-9
+michigan,R,R,R,R,D,D,D,D,D,D,R,D,R,6,7,-1
+minnesota,D,D,D,D,D,D,D,D,D,D,D,D,D,0,13,-13
+mississippi,D,R,R,R,R,R,R,R,R,R,R,R,R,12,1,11
+missouri,D,R,R,R,D,D,R,R,R,R,R,R,R,10,3,7
+montana,R,R,R,R,D,R,R,R,R,R,R,R,R,12,1,11
+nebraska,R,R,R,R,R,R,R,R,R,R,R,R,R,13,0,13
+nevada,R,R,R,R,D,D,R,R,D,D,D,D,R,7,6,1
+new hampshire,R,R,R,R,D,D,R,D,D,D,D,D,D,5,8,-3
+new jersey,R,R,R,R,D,D,D,D,D,D,D,D,D,4,9,-5
+new mexico,R,R,R,R,D,D,D,R,D,D,D,D,D,5,8,-3
+new york,D,R,R,D,D,D,D,D,D,D,D,D,D,2,11,-9
+north carolina,D,R,R,R,R,R,R,R,D,R,R,R,R,11,2,9
+north dakota,R,R,R,R,R,R,R,R,R,R,R,R,R,13,0,13
+ohio,D,R,R,R,D,D,R,R,D,D,R,R,R,8,5,3
+oklahoma,R,R,R,R,R,R,R,R,R,R,R,R,R,13,0,13
+oregon,R,R,R,D,D,D,D,D,D,D,D,D,D,3,10,-7
+pennsylvania,D,R,R,R,D,D,D,D,D,D,R,D,R,5,8,-3
+rhode island,D,D,R,D,D,D,D,D,D,D,D,D,D,1,12,-11
+south carolina,D,R,R,R,R,R,R,R,R,R,R,R,R,12,1,11
+south dakota,R,R,R,R,R,R,R,R,R,R,R,R,R,13,0,13
+tennessee,D,R,R,R,D,D,R,R,R,R,R,R,R,10,3,7
+texas,D,R,R,R,R,R,R,R,R,R,R,R,R,12,1,11
+utah,R,R,R,R,R,R,R,R,R,R,R,R,R,13,0,13
+vermont,R,R,R,R,D,D,D,D,D,D,D,D,D,4,9,-5
+virginia,R,R,R,R,R,R,R,R,D,D,D,D,D,8,5,3
+washington,R,R,R,D,D,D,D,D,D,D,D,D,D,3,10,-7
+west virginia,D,D,R,D,D,D,R,R,R,R,R,R,R,8,5,3
+wisconsin,D,R,R,D,D,D,D,D,D,D,R,D,R,4,9,-5
+wyoming,R,R,R,R,R,R,R,R,R,R,R,R,R,13,0,13
