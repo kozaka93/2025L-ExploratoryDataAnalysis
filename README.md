@@ -108,15 +108,15 @@ Wstęp do eksploracji danych składa się z:
     <td>02.kwi</td>
     <td>2</td>
     <td>projekt</td>
-    <td>P1: gotowe wykresy, projekt plakatu </td>
+    <td><i>P1: gotowe wykresy, projekt plakatu </i></td>
     <td>P1 (2p)</td>
   </tr>
   <tr>
     <td>08.kwi</td>
     <td>2</td>
     <td>lab</td>
-    <td>R: generowanie raportów z analizą danych</td>
-    <td>PD3 (6p)</td>
+    <td><a href="https://github.com/kozaka93/2025L-ExploratoryDataAnalysis/tree/main/labs/lab07">R: generowanie raportów z analizą danych</a></td>
+    <td><a href="https://github.com/kozaka93/2025L-ExploratoryDataAnalysis/issues/172">PD3 </a>(6p)</td>
   </tr>
   <tr>
     <td>09.kwi</td>
