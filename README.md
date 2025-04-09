@@ -122,7 +122,7 @@ Wstęp do eksploracji danych składa się z:
     <td>09.kwi</td>
     <td>2</td>
     <td>wykład</td>
-    <td>Nie popełniaj tych błędów!</td>
+    <td><a href="https://github.com/kozaka93/2025L-ExploratoryDataAnalysis/blob/main/lectures/L04-mistakes.pdf">Nie popełniaj tych błędów!</a></td>
     <td></td>
   </tr>
   <tr>
