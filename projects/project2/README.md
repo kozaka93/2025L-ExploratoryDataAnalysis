@@ -1,7 +1,4 @@
-
-
-# P2: t
-
+# P2: 
 Drugi projekt poświęcony jest interaktywnej eksploracji danych dotyczących ... . Celem projektu jest przygotowanie interaktywnego raportu/dashboardu (RMarkdown, RShiny, Dash), który przedstawi ciekawe informacje.
 
 Ostateczny wynik prezentowany jest na wykładzie (nagranie prezentacji do 3 minut lub prezentacja na żywo).
