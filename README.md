@@ -129,7 +129,7 @@ Wstęp do eksploracji danych składa się z:
     <td>15.kwi</td>
     <td>2</td>
     <td>lab</td>
-    <td>R: plotly</td>
+    <td><a href="https://github.com/kozaka93/2025L-ExploratoryDataAnalysis/tree/main/labs/lab08">R: plotly, leaflet</a></td>
     <td></td>
   </tr>
   <tr>
