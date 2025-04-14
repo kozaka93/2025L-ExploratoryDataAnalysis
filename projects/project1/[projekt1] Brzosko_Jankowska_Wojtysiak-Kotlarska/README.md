@@ -11,5 +11,4 @@ Autorzy: Maria Brzósko, Barbara Jankowska, Maja Wojtysiak-Kotlarska
 - https://www.kaggle.com/datasets/rajugc/imdb-movies-dataset-based-on-genre/data?fbclid=IwZXh0bgNhZW0CMTEAAR0Q6w8g23OcZtbpq3yJbVfsUHpYysM3aCGR_6MwIsVsETIMpEBwvMM6eSg_aem_o1YGcpq_UQ0pTJC8Hp03KA
 - https://bdl.stat.gov.pl/bdl/dane/podgrup/tablica
 
-<img src="projects/project1/%5Bprojekt1%5D%20Brzosko_Jankowska_Wojtysiak-Kotlarska/Brzosko_Jankowska_Wojtysiak-Kotlarska.png" alt="Plakat" width="600"/>
-<img src="Brzosko_Jankowska_Wojtysiak-Kotlarska.png" align="center" width="600"/>
+<img src="Brzosko_Jankowska_Wojtysiak-Kotlarska.pdf" align="center" width="600"/>
