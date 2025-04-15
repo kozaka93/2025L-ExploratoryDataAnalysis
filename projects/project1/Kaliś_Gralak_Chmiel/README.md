@@ -6,7 +6,7 @@ Opierając się na dostępnych danych, skupiliśmy się też na tym, że w głó
 Uznaliśmy ponadto za istotne podkreślenie utrzymującej się różnicy między kobietami a mężczyznami w korzystaniu z usług psychiatrycznych oraz przybliżenie,
 jak kształtują się planowe przyjęcia do szpitali w ostatnich latach.
 
-Autorzy: Imię1 Nazwisko1, Imię2 Nazwisko2, Imię3 Nazwisko3.
+Autorzy: Krystian Kaliś, Karolina Gralak, Wiktor Chmiel
 
 Źródło/a danych:
 - https://dane.gov.pl/pl/dataset/3523
@@ -16,5 +16,5 @@ Autorzy: Imię1 Nazwisko1, Imię2 Nazwisko2, Imię3 Nazwisko3.
 - https://stat.gov.pl/obszary-tematyczne/ludnosc/ludnosc/ludnosc-i-ruch-naturalny-w-2016-r-,30,1.html
 
 
-<img src="Kody/Kaliś_Gralak_Chmiel.pdf" align="center" width="600"/>
+<img src="Kody//Kaliś_Gralak_Chmiel.pdf" align="center" width="600"/>
 
