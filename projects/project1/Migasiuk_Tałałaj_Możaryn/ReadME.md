@@ -10,4 +10,4 @@ Maciej Migasiuk,Michał Tałałaj, Paweł Możaryn
 Źródła danych: 
 https://www.kaggle.com/datasets/bartoszpieniak/poland-cars-for-sale-dataset
 
-![PlakatMMMTPM](https://github.com/user-attachments/assets/94133c85-1716-410d-b922-c0c69786e87c)
+<img src="Migasiuk_Tałałaj_Możaryn.png" align="center" width="600"/>
