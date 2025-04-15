@@ -1,14 +1,14 @@
-## Tytuł plakatu
+## Imienne podium - Kto rządzi dziś w metrykach?
 
-Kilka zdań o plakacie. 
+Plakat na temat analizy trendów imion nadawanych dzieciom w Polsce w latach 2010-2024, ich związku z położeniem geograficznym i regionem a także badanie tendencji do wielkości zmian popularności imion w czasie.
 
-Autorzy: Imię1 Nazwisko1, Imię2 Nazwisko2, Imię3 Nazwisko3.
+Autorzy: Michalina Duda, Maria Eberhardt, Gerard Mańkowski.
 
-Źródło/a danych:
-- link1
-- link2
-- ...
+Źródła danych:
+- https://dane.gov.pl/pl/dataset/219
+- https://demografia.stat.gov.pl/bazademografia/Tables.aspx?utm_source=chatgpt.com
 
 
-<img src="nazwisko1_nazwisko2_nazwisko3.png" align="center" width="600"/>
+
+<img src="Duda_Eberhardt_Mankowski.png" align="center" width="600"/>
 
