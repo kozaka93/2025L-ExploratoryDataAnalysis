@@ -16,5 +16,5 @@ Autorzy: Imię1 Nazwisko1, Imię2 Nazwisko2, Imię3 Nazwisko3.
 - https://stat.gov.pl/obszary-tematyczne/ludnosc/ludnosc/ludnosc-i-ruch-naturalny-w-2016-r-,30,1.html
 
 
-<img src="Kaliś_Gralak_Chmiel.pdf" align="center" width="600"/>
+<img src="Kody/Kaliś_Gralak_Chmiel.pdf" align="center" width="600"/>
 
