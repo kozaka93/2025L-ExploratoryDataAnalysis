@@ -2,9 +2,9 @@ Plakat przedstawia analizę danych dotyczących kryzysu demograficznego w Polsce
 przedstawiające starzenie się polskiego społeczeństwa. 
 
 Autorzy:
-Kacper Wróbel
-Piotr Utkowski
-Jakub Tywonek
+- Kacper Wróbel
+- Piotr Utkowski
+- Jakub Tywonek
 
 Źródła danych:
 - https://bdl.stat.gov.pl/
