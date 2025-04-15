@@ -19,5 +19,6 @@ Tematyka jest ułożona w sposób logiczny – najpierw koncentrujemy się na ba
 - [ERA5 & ERA5-Land – Copernicus Climate Data Store](https://cds.climate.copernicus.eu/datasets/reanalysis-era5-land?tab=overview)  
 - [Open-Meteo – Historical Weather API](https://open-meteo.com/en/docs/historical-weather-api)
 
+![Plakat projektu](plakat.png)
 
 
