@@ -136,7 +136,7 @@ Wstęp do eksploracji danych składa się z:
     <td rowspan="2">16.kwi</td>
     <td>1</td>
     <td>wykład</td>
-    <td rowspan="2">Oddanie P1</td>
+    <td rowspan="2"><i>Oddanie P1</i></td>
     <td rowspan="2">P1 (19p)</td>
   </tr>
   <tr>
