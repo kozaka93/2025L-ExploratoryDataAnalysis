@@ -147,21 +147,21 @@ Wstęp do eksploracji danych składa się z:
     <td>23.kwi</td>
     <td>2</td>
     <td>projekt</td>
-    <td>P2: pomysł, źródło danych</td>
+    <td><i>P2: pomysł, źródło danych</i></td>
     <td>P2 (1p)</td>
   </tr>
   <tr>
     <td>29.kwi</td>
     <td>2</td>
     <td>lab</td>
-    <td>R: grafy</td>
+    <td>R: grafy, analiza tekstu</td>
     <td><a href="https://github.com/kozaka93/2025L-ExploratoryDataAnalysis/issues/234">PD4</a> (6p)</td>
   </tr>
   <tr>
     <td>30.kwi</td>
     <td>2</td>
     <td>wykład</td>
-    <td>Wizualizacja grafów</td>
+    <td>Wizualizacja grafów, analiza tekstu</td>
     <td></td>
   </tr>
   <tr>
