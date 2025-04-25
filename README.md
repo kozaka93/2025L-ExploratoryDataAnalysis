@@ -66,7 +66,7 @@ Wstęp do eksploracji danych składa się z:
     <td>12.mar</td>
     <td>2</td>
     <td>wykład</td>
-    <td>Sposoby badania rozkładu jednej zmiennej (ilościowej i jakościowej), sposoby badania rozkładu dwóch i więcej zmiennych.</td>
+    <td><i>Sposoby badania rozkładu jednej zmiennej (ilościowej i jakościowej), sposoby badania rozkładu dwóch i więcej zmiennych.</i></td>
     <td></td>
   </tr>
   <tr>
