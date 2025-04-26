@@ -24,13 +24,6 @@ library(ggplot2)
 #IBRIS dla tygodnika „Polityka”
 #16-17 kwietnia 2025 r. 
 # Wiec z nich bedziemy korzystać
-
-df <- data.frame(
-  kandydat = c("Rafał Trzaskowski", "Karol Nawrocki", "Sławomir Mentzen", 
-               "Szymon Hołownia", "Magdalena Biejat", "Adrian Zandberg", 
-               "Krzysztof Stanowski", "Grzegorz Braun", "Marek Jakubiak", 
-               "Joanna Senyszyn", "Artur Bartoszewicz", "Maciej Maciak"),
-  procent   = c(30.4, 24.9, 12.9, 7.3, 4.3, 3.3, 2.0, 1.3, 0.9, 0.9, 0.4, 0.2)
 )
 
 df <- data.frame(
@@ -47,7 +40,7 @@ y_max <- ceiling(max(df$procent) * 1.1)
 
 
 ggplot(df, aes(x = kandydat, y = procent)) +
-  geom_col(fill = "#4C72B0", width = 0.7) +  # łagodny niebieski
+  geom_col(fill = "#4C72B0", width = 0.7) + 
   geom_text(aes(label = paste0(procent, "%")),
             hjust = -0.1, size = 4, fontface = 'bold') +
   scale_x_discrete(expand = c(0, 0)) +
