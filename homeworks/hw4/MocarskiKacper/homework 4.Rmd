@@ -1,0 +1,58 @@
+# Praca domowa 4
+
+### Kacper Mocarski
+
+# Wykres źródłowy
+
+[![](https://cmm.imgw.pl/wp-content/uploads/2025/04/Anomalia_srednia_szablon_kwiecien_2025.png)](https://cmm.imgw.pl/wp-content/uploads/2025/04/Anomalia_srednia_szablon_kwiecien_2025.png)
+
+Źródło: [IMGW-PIB, modele.imgw.pl](https://cmm.imgw.pl/?p=44988)\
+Załączony wykres pochodzi z raportu IMGW-PIB dotyczącego średniej i anomalii temperatury w Polsce w kwietniu 2025. (data publikacji 14.04.2025r.)
+
+# Błędy w oryginalnej wizualizacji
+
+-   Skala osi X jest nieczytelna – daty zapisane w pełnej formie, która jest nieczytelna i niepotrzebna.
+-   Niepodpisane osie X i Y.
+-   Złe zagospodarowanie przestrzeni wykresu - widoczna pusta przestrzeń dla dni 11-30 kwietnia, mimo braku danych.
+
+# Przygotowanie danych i wizualizacji
+
+```{r dane, include=FALSE}
+#dane są danymi przybliżonymi (odczytane z wykresu), ponieważ dane źródłowe nie zostały opublikowane
+library(ggplot2)
+dane <- data.frame(
+  data = as.Date(c("2025-04-01", "2025-04-02", "2025-04-03", "2025-04-04", "2025-04-05",
+                   "2025-04-06", "2025-04-07", "2025-04-08", "2025-04-09", "2025-04-10")),
+  temp = c(7.8, 9.5, 10.2, 10.8, 3.6, 0.8, 3.2, 3.9, 4.5, 3.6),
+  anomalia = c(1.8, 2.6, 2.4, 3, 1.7, 0.4, -0.1, -0.3, -0.4, -0.7)
+)
+```
+
+```{r wykres, fig.height=5}
+
+ggplot(dane, aes(x = data)) +
+  geom_col(aes(y = temp, fill = "Średnia temperatura"), width = 0.7) +
+  geom_text(aes(y = temp, label = round(temp, 1)), vjust = -0.5, size = 3) +
+  geom_smooth(aes(y = anomalia, color = "Anomalia temperatury"), method = "loess", formula = y ~ x, se = FALSE, size = 1.2) +
+  scale_fill_manual(name = "", values = c("Średnia temperatura" = "skyblue")) +
+  scale_color_manual(name = "", values = c("Anomalia temperatury" = "darkblue")) +
+  labs(
+    title = "Średnia temperatura i anomalia temperatury w Polsce",
+    subtitle = "Dane za okres 01-10.04.2025",
+    x = "Data",
+    y = "Temperatura (°C)",
+    caption = "Anomalia średniej temperatury powietrza wyliczona względem normy z lat 1991-2020 
+    Źródło: IMGW-PIB, modele.imgw.pl"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.title = element_text(face = "bold", size = 16),
+    plot.subtitle = element_text(size = 12),
+    legend.position = "top"
+  ) 
+```
+
+# Dlaczego nowa wizualizacja jest lepsza?
+
+Nowy wykres poprawia czytelność: ogranicza zakres czasu tylko do dostępnych danych (01–10.04.2025), ponadto daty i temperatura zostały zapisane w uproszczonym zapisie. Dodałem także opisy osi oraz wartości średniej temperatury w poszczególnych dniach, aby ułatwić odczytywanie wykresu.
