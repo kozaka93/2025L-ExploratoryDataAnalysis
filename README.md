@@ -154,7 +154,7 @@ Wstęp do eksploracji danych składa się z:
     <td>29.kwi</td>
     <td>2</td>
     <td>lab</td>
-    <td>R: grafy, analiza tekstu</td>
+    <td><a href="https://github.com/kozaka93/2025L-ExploratoryDataAnalysis/tree/main/labs/lab09">R: grafy, analiza tekstu</a></td>
     <td><a href="https://github.com/kozaka93/2025L-ExploratoryDataAnalysis/issues/234">PD4</a> (6p)</td>
   </tr>
   <tr>
