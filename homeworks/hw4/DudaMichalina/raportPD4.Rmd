@@ -1,0 +1,117 @@
+---
+title: "PD4 Michalina Duda"
+date: "2023-04-23"
+output: 
+  html_document: 
+    toc: true
+    toc_float: true
+    code_folding: hide
+    theme: united
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r, message=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+library(plotly)
+library(tidyr)
+library(DT)
+```
+
+# Wybrany wykres
+
+Wykres przedstawia zmiany wartości wybranych polskich spółek giełdowych
+w miesiącu ogłoszenia przez prezydenta USA ceł na towary z UE. Pokazuje
+zmianę wartości na przestrzeni miesiąca.
+
+```{r, message=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::include_graphics("/Users/misiaduda/Desktop/obraz1.png")
+```
+
+Link do artykułu z wizualizacją:
+
+<https://businessinsider.com.pl/gielda/panstwowe-spolki-juz-stracily-przez-cla-trumpa-tyle-sa-warte-wykresy/1st39s3>
+
+### Niepoprawności w wizualizacji
+
+Trudne jest precyzyjne odczytanie wartości przed i po spadku. Dodatkowo
+nie można odczytać z wykresu spadku procentowego względem początkowej
+wartości kursu - co w tym wypadku jest jedną z kluczowych informacji.
+
+# Nowa wizualizacja
+
+```{r Nowa wizualizacja, message=FALSE}
+dane <- data.frame(
+  Spolka = c("ORLEN", "PKO BP", "PZU", "PGE", "KGHM", "ENEA", "TAURON", "JSW"),
+  Wartosc_po = c(73050, 81950, 46000, 17350, 21550, 7720, 8720, 2620),
+  Strata = c(7150, 12550, 4050, 1150, 4000, 590, 155, 185)
+)
+
+
+dane <- dane %>%
+  mutate(
+    Wartosc_przed = Wartosc_po + Strata,
+    Procent_straty = round(100 * Strata / Wartosc_przed, 1)
+  ) %>%
+  arrange(desc(Wartosc_przed))  
+dane$Spolka <- factor(dane$Spolka, levels = dane$Spolka)
+
+
+dane <- dane %>%
+  mutate(
+    label = paste0(
+      "Wartość przed: ", Wartosc_przed, " mln zł<br>",
+      "Wartość po: ", Wartosc_po, " mln zł<br>",
+      "Strata: ", Strata, " mln zł<br>",
+      "Spadek (%): ", Procent_straty, "%"
+    )
+  )
+
+
+dane_long <- dane %>%
+  select(Spolka, Wartosc_po, Strata, Typ_label = label) %>%
+  pivot_longer(cols = c(Wartosc_po, Strata), names_to = "Typ", values_to = "Wartosc") %>%
+  mutate(
+    Typ = factor(Typ, levels = c("Wartosc_po", "Strata"))
+  )
+
+
+plot_ly(
+  data = dane_long,
+  x = ~Wartosc,
+  y = ~Spolka,
+  type = "bar",
+  orientation = "h",
+  color = ~Typ,
+  colors = c("skyblue", "red"),
+  text = ~Typ_label,
+  hoverinfo = "text",
+  textposition = "none" 
+) %>%
+  layout(
+    barmode = "stack",
+    title = list(
+      text = "Wartość spółek przed i po ogłoszeniu ceł przez USA kwiecień 2025",
+      y = 0.97 
+    ),
+    xaxis = list(title = "Wartość (mln zł)", tickformat = ",d"),
+    yaxis = list(title = "Nazwa spółki"),
+    legend = list(
+      orientation = "h",  
+      x = 0.8,            
+      xanchor = "center", 
+      y = .5            
+    ))
+
+```
+
+## Ulepszenia
+
+Użytkownik może sprawadzić bardzo dokładnie wartości przed i po spadku
+jak i jego procentową wielkość. Wykres słupkowy jest bardziej czytelny
+przy odczytywaniu zmiany jaka nastąpiła i jak duża była w porównaniu do
+początkowej wartości kursu.
