@@ -161,7 +161,7 @@ Wstęp do eksploracji danych składa się z:
     <td>30.kwi</td>
     <td>2</td>
     <td>wykład</td>
-    <td>Wizualizacja grafów, analiza tekstu</td>
+    <td>--</td>
     <td></td>
   </tr>
   <tr>
@@ -196,7 +196,7 @@ Wstęp do eksploracji danych składa się z:
     <td>21.maj</td>
     <td>2</td>
     <td>wykład</td>
-    <td>Dashboardy, historia, IBCS</td>
+    <td>Wizualizacja grafów, analiza tekstu, dashboardy, historia, IBCS</td>
     <td></td>
   </tr>
   <tr>
