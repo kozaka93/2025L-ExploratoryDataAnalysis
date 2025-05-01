@@ -161,7 +161,7 @@ Wstęp do eksploracji danych składa się z:
     <td>30.kwi</td>
     <td>2</td>
     <td>wykład</td>
-    <td>--</td>
+    <td>-</td>
     <td></td>
   </tr>
   <tr>
