@@ -1,0 +1,57 @@
+---
+title: "Praca domowa 4"
+author: "Imię Nazwisko - Michalina Woźnica"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+    theme: united
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+Sys.setlocale("LC_TIME", "English")
+
+dane <- data.frame(
+  godzina = 0:23,
+  wywolania = c(2132, 4290, 279, 1937, 1344, 2957, 4621, 8287, 5911, 7429, 6034, 3449, 4637, 3755, 4265, 5861, 4696, 3396, 6609, 5977, 3081, 2932, 2844, 2442),
+  pliki = c(917, 485, 316, 254, 306, 504, 1000, 1391, 1920, 2887, 1989, 2266, 
+            1802, 1946, 2035, 2637, 3100, 2205, 1523, 1619, 1727, 1648, 1408, 894),
+  strony = c(1163, 3840, 1830, 1658, 1073, 2396, 3561, 6744, 3809, 5152, 4180, 1870,2714, 1985, 2160, 3101, 1488, 1091, 5105, 4206, 1260, 1138, 1415, 1471)
+  )
+
+
+```
+
+## Dane 
+Dane i poprawiany wykres znaleziono na stronie https://nowyzagorz.pl/stat/usage_202504.html, wykres drugi. Dane przedstawiają statystyki godzinowe dla strony "nowyzgorz.pl", która zajmuje się Parafią pw. św.Józefa Rzemieślnika w Zagórzu (Nowy Zagórz).
+
+
+## Dlaczego wykres jest zły ?
+Zauważmy, że wykres nie jest jakkolwiek oznakowany; nie ma on klarownych i dobrze podpisanych osi, więc przy pierwszym wrażeniu jest on dość nieczytelny. Dodatkowo słupki danych dla różnych kategorii nachodzą na siebie, co przy obecnym doborze kolorów nie oddziaływuje dobrze na zrozumienie daych, zwizualizowanych na tym wykresie.
+
+```{r poprawienie wykresu, message=FALSE}
+
+dane %>% 
+  pivot_longer(cols = c(wywolania, pliki, strony),
+               names_to = "typ",
+               values_to = "liczba") %>% 
+  ggplot(aes(x = factor(godzina), y = liczba)) +
+  geom_col(fill = "pink") +
+  facet_wrap(~ typ, ncol = 1) +  
+  labs(
+    title = "liczba wywołań, plików i stron według godziny",
+    x = "godzina",
+    y = "liczba"
+  ) +
+  theme_minimal()
+
+```
+
+**Dodane zostały odpowiednie oznaczenia osi oraz tytuły. Dodatkowo dane zostały rozdzielone na trzy wykresy co ułatwia ich odebranie i sprawia, że kolumny nie nachodzą na siebie i nie blokują siebie nawzajem.**
+
