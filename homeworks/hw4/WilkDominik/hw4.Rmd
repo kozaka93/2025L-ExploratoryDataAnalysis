@@ -1,0 +1,53 @@
+---
+title: "HW4"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd("D:/Studia/4 semest/Eksploracja/HW4")
+library(dplyr)
+library(ggplot2)
+library(scales)
+
+df<-read.csv("wyniki.csv")
+df$Nazwisko <- as.character(df$Nazwisko)
+```
+## Źródło wykresu
+
+https://ewybory.eu/wybory-prezydenckie-2025-polska/sondaze-prezydenckie/
+
+## Opis błędów popełniowych na wykresie
+
+Pierwszym błędem jest podwójne oznaczenie kandydatów zarówno przez podpisanie nazwiskami jak i kolorem.
+Na przedstawionym wykresie ciężko jest też odczytać nazwiska kandydatów oraz procent poparcia który posiadają.
+Jest to wykres interaktywny ale w pełnej wersji prezentowanych danych
+nie da się praktycznie odczytać żadnych informacji.
+
+## Kod do wygenerowania poprawionego wykresu
+
+```{r}
+df %>%  
+  arrange(desc(Wynik)) %>% 
+  mutate(Nazwisko = forcats::fct_reorder(Nazwisko, Wynik)) %>% 
+  ggplot(aes(x = Wynik/100, y = Nazwisko)) +
+  geom_col(fill = "#4d68f7", color = "black") +
+  scale_x_continuous(expand=c(0,0), labels = percent_format()) +
+  theme_minimal() +
+  labs(
+    title = "Sondaż prezydencki z dni 17-19 kwietnia 2025",
+    subtitle = "Dane pochodzą ze strony ewybory.eu",
+    y = "Kandydaci",
+    x = "Procentowe poparcie"
+  ) +
+  theme(
+    plot.title = element_text(hjus = 0.5),
+    plot.subtitle = element_text(hjus = 0.5)
+  )
+
+
+```
+
+## Poprawione błędy
+
+Przedstawienie danych w postaci słupków poprawia czytelność wykresu, bez problemu możliwe jest odczytanie jakie poparcie ma każdy kadydat.
