@@ -175,7 +175,7 @@ Wstęp do eksploracji danych składa się z:
     <td>07.maj</td>
     <td>2</td>
     <td>projekt</td>
-    <td>P2: eksploracja danych, pomysły na wykresy, prototypy wykresów</td>
+    <td><i>P2: eksploracja danych, pomysły na wykresy, prototypy wykresów</i></td>
     <td>P2 (2p)</td>
   </tr>
   <tr>
