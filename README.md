@@ -182,7 +182,7 @@ Wstęp do eksploracji danych składa się z:
     <td>13.maj</td>
     <td>2</td>
     <td>lab</td>
-    <td>R: Shiny 2</td>
+    <td><a href="https://github.com/kozaka93/2025L-ExploratoryDataAnalysis/tree/main/labs/lab11">R: Shiny 2</a></td>
     <td></td>
   </tr>
   <tr>
