@@ -1,0 +1,230 @@
+---
+title: "Co jest lepsze - pie chart czy barplot?"
+author: "Ewa Junosza-Szaniawska"
+date: "2025-05-12"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+    theme: united
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+## Wczytanie potrzebnych bibliotek
+library(RColorBrewer)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(gridExtra)
+library(grid)
+
+## Generowanie wykresów do ankiety
+liczba <- c(38, 20, 31, 5, 16, 9, 18, 1,  4)
+miejsce <- rep(c("brązowa szafa", "biała szafa", "biurko"), each = 3)
+półka <- rep(c("górna", "środkowa", "dolna"), 3)
+data <- data.frame(miejsce, półka, liczba)
+data$półka <- factor(data$półka, levels=c("górna", "środkowa", "dolna"))
+
+plot1 <- pie(data$liczba, labels = paste(data$miejsce, data$półka, "półka"), col=brewer.pal(n = 9, name = "YlGnBu"), main = "Liczba książek w podziale na półki")
+
+plot2 <- data %>%
+  ggplot(aes(y = liczba, x = miejsce, fill = półka)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_y_continuous(expand = c(0,0)) +
+  scale_fill_manual("legend", values = brewer.pal(n = 3, name = "YlGnBu")) +
+  guides(fill=guide_legend(title="półka")) +
+  labs(title = "Liczba książek w podziale na półki")
+
+plot3 <- data %>% 
+  ggplot(aes(y = liczba, x = miejsce, fill = półka)) +
+  geom_bar(stat = "identity") +
+  scale_y_continuous(expand = c(0,0)) +
+  scale_fill_manual("legend", values = brewer.pal(n = 3, name = "YlGnBu")) +
+  guides(fill=guide_legend(title="półka")) +
+  labs(title = "Liczba książek w podziale na półki")
+
+grid.arrange(plot2, plot3)
+
+### Ankieta
+# https://forms.gle/DciU2ocKN2qNG3Tr6
+# Pozostawiłam opcję akceptowania odpowiedzi, żeby zainteresowany czytelnik mógł przejść sam przez proces bycia ankietowanym
+# Wyniki ankiet, na których pracuję, to wyniki z 12 maja z 21:08
+
+### Wczytanie wyników ankiet
+responses <- read.csv("hw5.csv")
+
+### Stworzenie zmiennej pomocniczej
+color <- brewer.pal(n = 3, name = "YlOrRd")
+```
+
+## Problem badawczy i ankieta
+
+Porównuję typy wykresów - pie chart oraz barplot (grouped i stacked). Sprawdzam na ile skutecznie ludzie je odczytują i który typ wzbudza największą sympatię opinii publicznej.
+
+W tym celu przeprowadziłam trzyetapową ankietę.
+
+#### Uwaga
+
+Dane, które przedstawiają wykresy w ankiecie zostały zmyślone na potrzeby tej pracy domowej. Zbieżność czegokolwiek przypadkowa.
+
+### Etap 1 - pytanie pomocnicze
+"Wybierz jedną z opcji: a, opcja 2, inna odpowiedź"
+
+Każdy z wyborów prowadził do innego typu wykresu na etapie 2.
+
+#### Ciekawostka
+
+Odpowiedzi na to pytanie rozłożyły się bardzo równomiernie, z lekką przewagą "opcji 2":
+
+```{r etap1}
+etap1 <- responses %>% 
+  group_by(Wybierz.jedną.z.opcji) %>% 
+  summarize(count = n())
+
+pie(etap1$count, labels = paste(etap1$Wybierz.jedną.z.opcji, ": ", round(etap1$count/56*100,1), "%", sep=''), col = color)
+```
+
+### Etap 2 - Odczytywanie wykresu
+
+Każdy ankietowany dostawał te same trzy pytania:
+
+* "Gdzie jest więcej książek?
+brązowa szafa górna półka/brązowa szafa środkowa półka/brązowa szafa dolna półka"
+
+* "Gdzie jest więcej książek?
+brązowa szafa środkowa półka/biała szafa środkowa półka/biurko dolna półka"
+
+* "Gdzie jest mniej książek?
+biała szafa górna półka/biurko górna półka/biała szafa dolna półka"
+
+i musiał na nie odpowiedzieć na podstawie jednego z poniższych wykresów:
+
+```{r plot1}
+pie(data$liczba, labels = paste(data$miejsce, data$półka, "półka"), col=brewer.pal(n = 9, name = "YlGnBu"), main = "Liczba książek w podziale na półki")
+```
+
+```{r plot2}
+data %>%
+  ggplot(aes(y = liczba, x = miejsce, fill = półka)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_y_continuous(expand = c(0,0)) +
+  scale_fill_manual("legend", values = brewer.pal(n = 3, name = "YlGnBu")) +
+  guides(fill=guide_legend(title="półka")) +
+  labs(title = "Liczba książek w podziale na półki")
+```
+
+```{r plot3}
+data %>% 
+  ggplot(aes(y = liczba, x = miejsce, fill = półka)) +
+  geom_bar(stat = "identity") +
+  scale_y_continuous(expand = c(0,0)) +
+  scale_fill_manual("legend", values = brewer.pal(n = 3, name = "YlGnBu")) +
+  guides(fill=guide_legend(title="półka")) +
+  labs(title = "Liczba książek w podziale na półki")
+```
+
+### Etap 3 - podsumowanie
+
+"Który wykres Twoim zdaniem jest najbardziej czytelny?
+pie chart/grouped barplot/stacked barplot"
+
+Poza tym były dwa nieobowiązkowe pytania. W jednym można było zostawić jakiś komentarz mniej więcej na temat, a w drugim wyjawić swoją tożsamość.
+
+## Analiza
+
+### Skuteczność w odczytywaniu wykresów
+
+Zdecydowanie najmniej błędów robią ludzie odczytując dane z wykresu typu stacked barplot, a najwięcej - co nikogo nie dziwi - typu pie chart.
+Zaskakująca może być liczba niepoprawnych odpowiedzi w trzecim pytaniu przy wykresie typu grouped barplot, ale ogólnie ten typ wykresu wydaje się być raczej niezły.
+
+```{r pom_błędy, include = FALSE}
+pom1 <- responses %>% 
+  filter(Wybierz.jedną.z.opcji == "a") %>% 
+  mutate(typ = "pie chart", pyt1 = Gdzie.jest.więcej.książek., pyt2 = Gdzie.jest.więcej.książek..1, pyt3 = Gdzie.jest.mniej.książek.) %>% 
+  select(typ, pyt1, pyt2, pyt3)
+pom2 <- responses %>% 
+  filter(Wybierz.jedną.z.opcji == "opcja 2") %>% 
+  mutate(typ = "grouped barplot", pyt1 = Gdzie.jest.więcej.książek..2, pyt2 = Gdzie.jest.więcej.książek..3, pyt3 = Gdzie.jest.mniej.książek..1) %>% 
+  select(typ, pyt1, pyt2, pyt3)
+pom3 <- responses %>% 
+  filter(Wybierz.jedną.z.opcji == "inna odpowiedź") %>% 
+  mutate(typ = "stacked barplot", pyt1 = Gdzie.jest.więcej.książek..4, pyt2 = Gdzie.jest.więcej.książek..5, pyt3 = Gdzie.jest.mniej.książek..2) %>% 
+  select(typ, pyt1, pyt2, pyt3)
+pom <- rbind(rbind(pom1, pom2), pom3)
+```
+
+```{r błędy, message = FALSE}
+pompom <- pom %>% 
+  mutate(p1 = ifelse(pyt1 == "brązowa szafa górna półka", "poprawna", "błędna"),
+         p2 = ifelse(pyt2 == "brązowa szafa środkowa półka", "poprawna", "błędna"),
+         p3 = ifelse(pyt3 == "biała szafa górna półka", "poprawna", "błędna"))
+
+res1 <- pivot_longer(pompom, p1) %>%
+  select(typ, name, value)
+res2 <- pivot_longer(pompom, p2) %>%
+  select(typ, name, value)
+res3 <- pivot_longer(pompom, p3) %>%
+  select(typ, name, value)
+
+res <- rbind(rbind(res1, res2), res3)
+
+plot1 <- res %>% 
+  filter(typ == "pie chart") %>% 
+  group_by(name, value) %>% 
+  summarize(count = n()) %>% 
+  ggplot(aes(y = count, x = name, fill = value)) +
+  geom_bar(position = "fill", stat = "identity") +
+  scale_y_continuous(expand = c(0,0)) +
+  scale_fill_manual("legend", values = color) +
+  labs(title = "pie chart", y = "procent", x = "pytanie") +
+  guides(fill=guide_legend(title="odpowiedź")) 
+plot2 <- res %>% 
+  filter(typ == "grouped barplot") %>% 
+  group_by(name, value) %>% 
+  summarize(count = n()) %>% 
+  ggplot(aes(y = count, x = name, fill = value)) +
+  geom_bar(position = "fill", stat = "identity") +
+  scale_y_continuous(expand = c(0,0)) +
+  scale_fill_manual("legend", values = color) +
+  labs(title = "grouped barplot", y = "", x = "pytanie") +
+  guides(fill=guide_legend(title="odpowiedź")) 
+plot3 <- res %>% 
+  filter(typ == "stacked barplot") %>% 
+  group_by(name, value) %>% 
+  summarize(count = n()) %>% 
+  ggplot(aes(y = count, x = name, fill = value)) +
+  geom_bar(position = "fill", stat = "identity") +
+  scale_y_continuous(expand = c(0,0)) +
+  scale_fill_manual("legend", values = color) +
+  guides(fill=guide_legend(title="odpowiedź")) +
+  labs(title = "stacked barplot", y = "", x = "pytanie")
+
+grid.arrange(plot1, plot2, plot3, ncol = 3)
+```
+
+### Prywatne preferencje
+
+Wyraźnie widać, że największą popularnością cieszy się grouped barplot.
+
+```{r preferencje}
+responses %>% 
+  group_by(Który.wykres.Twoim.zdaniem.jest.najbardziej.czytelny.) %>% 
+  summarize(count = n()) %>% 
+  ggplot(aes(y = count, x = Który.wykres.Twoim.zdaniem.jest.najbardziej.czytelny.)) +
+  geom_bar(stat = "identity", position = "dodge", fill = color[3]) +
+  scale_y_continuous(expand = c(0,0)) +
+  guides(fill=guide_legend(title="półka")) +
+  labs(title = "Który wykres Twoim zdaniem jest najbardziej czytelny?",
+       x = "",
+       y = "liczba odpowiedzi") +
+  scale_x_discrete(labels=c("pie chart (po lewej)" = "pie chart", "grouped barplot (po prawej, na górze)" = "grouped barplot", "stacked barplot (po prawej, na dole)" = "stacked barplot"))
+```
+
+Trzeba jednak dodać, że kilka osób wyraziło w pytaniu otwartym opinię, że stacked barplot jest równie dobry albo że to zależy od kontekstu i tego, co my z tamtego wykresu tak właściwie mamy odczytać.
+
+## Wnioski
+
+Oba rodzaje typu barplot są wyraźnie lepsze niż typ pie chart. Można na podstawie tego przypuszczać, że ludzie mają większy problem z szacowaniem kątów niż wysokości prostokątów.
