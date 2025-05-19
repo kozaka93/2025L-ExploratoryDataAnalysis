@@ -1,0 +1,114 @@
+---
+title: "Porównanie wykresów słupkowych i kołowych na przykładzie wizualizacji poparcia kandydatów na prezydentów"
+author: "Roksana Rogalska"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+    theme: united
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+library(knitr)
+
+### Wczytanie danych
+df <-kandydaci <- c("Rafał Trzaskowski", "Karol Nawrocki", "Sławomir Mentzen",
+               "Magdalena Biejat", "Szymon Hołownia", "Adrian Zandberg",
+               "Grzegorz Braun", "Marek Jakubiak", "Joanna Senyszyn",
+               "Krzysztof Stanowski", "Artur Bartoszewicz",
+               "Maciej Maciak", "Marek Woch", "Trudno powiedzieć", "Odmowa odpowiedzi")
+
+poparcie <- c(31, 25, 14, 6, 5, 5, 4, 3, 2, 1, 1, 0, 0, 2, 1)
+
+sondaz <- data.frame(Kandydat = kandydaci, Poparcie_procent = poparcie)
+
+sum(sondaz$Poparcie_procent) # Sprawdzam czy 100%
+      
+kolory <- c("lavender", "lightsteelblue", "powderblue",  "lightskyblue", "skyblue",
+            "lightblue", "cadetblue", "steelblue", "cornflowerblue", "deepskyblue",
+            "dodgerblue", "royalblue", "blue", "mediumblue", "navyblue")
+
+sondaz$Kandydat <- factor(sondaz$Kandydat, levels = rev(sondaz$Kandydat))
+
+```
+
+### Dane
+Dane przedstawiają poparcie dla kandydatów na prezydentów w wyborach prezydenckich w 2025 roku, zostały pobrane ze strony TVN24.
+
+## Cel eksperymentu
+Celem eksperymentu było sprawdzenie, który z przygotowanych wykresów będzie bardziej czytelny i "lepszy" według osób ankietowanych. Chciałam sprawdzić jak odbiorcy postrzegają dane na wykresie słupkowym i kołowym, który z nich będzie bardziej lubiany przez ankietowanych i czy sprawdzi się teza, że to wykresy kołowe gorzej przedstawiają wyniki i są trudniejsze do odczytania.
+
+## Opis eksperymentu
+Do przeprowadzenia eksperymentu przygotowłam 2 wykresy przedstawiające te same dane, lecz w inny sposób.
+
+- Wykres słupkowy – uważany za bardziej precyzyjny w odbiorze i umożliwiający łatwiejsze porównanie wartości.
+
+- Wykres kołowy – często uznawany za mniej czytelny ze względu na trudność porównywania kątów.
+
+Po stworzeniu wykresów, przeprowadziłam ankietę, w której zadałam pytanie "Który z prezentowanych wykresów jest lepszy?".
+
+Oba wykresy przedstawione sa poniżej.
+
+
+### Wykres 1 
+Wykres 1 przedstawia poparcie dla kandydatów w postaci słupków.
+
+```{r wykres 1, message=FALSE}
+sondaz %>% 
+  ggplot(aes(y = Kandydat, x = Poparcie_procent)) + 
+  geom_col(fill="navyblue") + labs(
+    title = "Poparcie dla kandydatów w wyborach prezydenckich 2025",
+    x = "Procent poparcia",
+    y = "Kandydaci na prezydenta") + 
+  scale_x_continuous(labels = scales::percent_format(scale = 1)) + 
+  theme_minimal() 
+```
+
+### Wykres 2 
+Wykres 2 przedstawia poparcie dla kandydatów na wykresie kołowym.
+
+```{r wykres 2, message=FALSE}
+sondaz %>%
+  mutate(procent_label = ifelse(Poparcie_procent > 3,
+                                paste0(Poparcie_procent, "%"),
+                                "")) %>%
+  ggplot(aes(x = "", y = Poparcie_procent, fill = Kandydat)) +
+  geom_bar(width = 1, stat = "identity", color = "white") +
+  coord_polar(theta = "y") +
+  geom_text(aes(label = procent_label),
+            position = position_stack(vjust = 0.5),
+            color = "white",
+            size = 4) +
+  scale_fill_manual(values = kolory) +
+  labs(title = "Procent poparcia dla kandydatów w wyborach prezydenckich 2025") +
+  theme_void() +
+  theme(legend.position = "right") + guides(fill = guide_legend(reverse = TRUE))
+```
+
+## Wyniki badania
+W moim badaniu wzięło udział 46 osób, w poniższej tabeli przedstawione są wyniki.
+```{r, echo=FALSE}
+wyniki <- c(35, 11)
+wykresy <- c('Słupkowy', 'Kołowy')
+procent <- c(76.1, 23.9)
+wn <- data.frame(Wykres = wykresy,
+                 Liczba = wyniki,
+                 Procent = procent)
+kable(wn, caption = "Preferencje wykresów", format = "html")
+```
+
+## Wnioski i podsumowanie
+Zdecydowana większość badanych (ponad 76%) wskazała wykres słupkowy jako bardziej czytelny i preferowany sposób prezentowania danych. Zatem teza opracowana lata temu się sprawdziła, a ankietowani uznali wykres słupkowy za lepszy od kołowego, główne powody to:
+
+- Porównywanie długości słupków jest łatwiejsze niż porównywanie kątów, w szczególności łatiwej odczytać jakie wyniki osiągnęli kandydaci z najniższymi wynikami. 
+
+- Wykres słupkowy lepiej prezentuje różnice między kandydatami, szczególnie w środku stawki.
+
+- Wykres kołowy może być atrakcyjny wizualnie, ale mniej praktyczny poznawczo. 
+
+- Na wykresie słupkowym w łatwy sposób można od razu zauważyć, który z kandydatów otrzymał 0% poparcia.
