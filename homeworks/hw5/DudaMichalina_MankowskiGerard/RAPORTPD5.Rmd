@@ -1,0 +1,217 @@
+---
+title: "Analiza czytelności wykresów – raport z ankiety"
+author: "Michalina Duda, Gerard Mańkowski"
+output: html_document
+date: "2025-05-13"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(patchwork) 
+library(dplyr)
+library(plotrix)
+library(grid)
+library(magick)
+```
+
+## Eksperyment 1
+
+Eksperyment pierwszy dotyczył 6 różnych wykresów opisujących procentowy udział
+wybranych źródeł energii w Polsce. Są to wykresy: kołowy 2D, słupkowy oraz kołowy 
+3D kolorowe i szare. Celem eksperymentu jest zbadanie najlepszego sposobu na 
+wizualizację procentowego udziału przedmiotów w całości oraz przeanalizowanie, czy 
+kolor na wykresach pomoga odbiorcy w odczytaniu wyników. Przeprowadzono ankietę,  
+w której zadano dwa pytania:
+
+1. "Który z przedstawionych typów wykresów jest najbardziej przejrzysty i czytelny?"
+
+2. "Który z orzedstawionych wykresów - kolorowy czy szary - jest bardziej przejrzysty 
+i czytelny?"
+
+
+### Wykresy
+
+```{r Eksperyment1, tidy=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
+energy_raw <- data.frame(
+  Źródło = c("Węgiel", "OZE", "Gaz", "Jądrowa"),
+  Procent = c(40, 30, 20, 10)
+)
+
+colors <- c(
+  "Węgiel" = "#E07B7A",
+  "OZE" = "#6497B1",
+  "Gaz" = "#72A37F",
+  "Jądrowa" = "#9E79B9"
+)
+
+energy <- energy_raw %>%
+  arrange(desc(Procent)) %>%
+  mutate(
+    ypos = cumsum(Procent) - 0.5 * Procent,
+    label = paste0(Źródło, ": ", Procent, "%")
+  )
+
+p1a <- ggplot(energy, aes(x = "", y = Procent, fill = Źródło)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar("y") +
+  scale_fill_manual(values = colors) +
+  theme_void() +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold"))
+
+p1b <- ggplot(energy, aes(x = "", y = Procent, fill = Źródło)) +
+  geom_bar(stat = "identity", width = 1, color = "black", fill = "gray70") +
+  coord_polar("y", start = 0) +
+  theme_void() +
+  geom_text(aes(y = ypos, label = label), color = "black", size = 4) +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold")) +
+  guides(fill = FALSE)
+
+(p1a | p1b) +
+  plot_annotation(title = "Wykresy 1a i 1b: źródła energii - wykresy kołowe 2D",
+                  theme = theme(
+      plot.title = element_text(size = 15, hjust = 0.5)
+    ))
+
+p2a <- ggplot(energy, aes(x = Źródło, y = Procent, fill = Źródło)) +
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = colors) +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold"))
+
+p2b <- ggplot(energy, aes(x = Źródło, y = Procent)) +
+  geom_bar(stat = "identity", fill = "gray60", color = "black") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold"))
+
+(p2a | p2b) +
+  plot_annotation(title = "Wykresy 2a i 2b: źródła energii - wykresy słupkowe",
+                  theme = theme(
+      plot.title = element_text(size = 15, hjust = 0.5)
+    ))
+
+cols_vec <- colors[as.character(energy_raw$Źródło)]
+
+par(mfrow = c(1, 2), oma = c(0, 0, 3, 0))   # dwa wykresy w jednym wierszu
+
+invisible(png("plot3a.png", width = 400, height = 400))
+par(mar = c(1, 1, 1, 1))
+pie3D(energy_raw$Procent,
+      labels = energy_raw$Źródło,
+      col = cols_vec)
+invisible(dev.off())
+
+invisible(png("plot3b.png", width = 400, height = 400))
+  par(mar = c(1, 1, 1, 1))
+pie3D(energy_raw$Procent,
+      labels = paste0(energy_raw$Źródło, ": ", energy_raw$Procent, "%"),
+      col = rep("gray80", length(energy_raw$Procent)))
+invisible(dev.off())
+
+img1 <- image_read("plot3a.png")
+img2 <- image_read("plot3b.png")
+
+img1_trimmed <- image_trim(img1)
+img2_trimmed <- image_trim(img2)
+
+image_write(img1_trimmed, path = "plot3a_trimmed.png")
+image_write(img2_trimmed, path = "plot3b_trimmed.png")
+
+p3a <- wrap_elements(grid::rasterGrob(png::readPNG("plot3a_trimmed.png"), interpolate = TRUE))
+p3b <- wrap_elements(grid::rasterGrob(png::readPNG("plot3b_trimmed.png"), interpolate = TRUE))
+
+(p3a | p3b) + 
+  plot_annotation(title = "Wykresy 3a i 3b: źródła energii – wykresy kołowe 3D",
+                  theme = theme(
+      plot.title = element_text(size = 15, hjust = 0.5)
+    ))
+```
+
+
+### Wyniki ankiety
+
+Spośród 20 ankietowanych 11 osób odpowiedziało się za wykresem kołowym 2D, 7 osób za 
+wykresem słupkowym i 2 osoby za wykresem kołowym 3D.
+Natomiast w pytaniu dotyczącym koloru wykresu 17 osób wybrało wykres kolorowy, a
+3 osoby wykres szary.
+
+
+### Wnioski
+
+Z odpowiedzi ankietowanych można wywnioskować, że wykres kołowy 3D jest słabo czytelny,
+natomiast porównując wykresy kołowy 2D oraz słupkowy, ten pierwszy charakteryzuje
+się większą przejrzystością oraz czytelnością. Wyniki ankiety pokazują, że problem
+z odczytywaniem wykresu kołowego 3D nadal występuje w społeczeństwie.
+Jeżeli chodzi o kolor w wykresach, brak róźnorodności wpływa negatywnie na przejrzystość
+wyników.Użycie koloru sprawia, że wykres jest czytelniejszy.
+
+
+## Eksperyment 2
+
+Eksperyment drugi dotyczył 4 różnych typów wykresów opisujących liczbę zachorowań 
+na COVID oraz grypę w miesiącach styczeń-czerwiec. Wykresy przedstawiające wyniki
+tych obserwacji to: liniowy, dot plot, słupkowy oraz heatmap. Zbadano jaki rodzaj
+wykresu jest najlepszy do obserwowania trendu występowania danego zjawiska - czy 
+jest to wykres liniowy, jak uznaje się powszechnie?
+
+
+### Wykresy
+
+```{r Eksperyment 2, echo=FALSE, warning=FALSE, message=FALSE}
+
+data <- data.frame(
+  Miesiac = factor(rep(c("Sty", "Lut", "Mar", "Kwie", "Maj", "Cze"), times = 2),
+                   levels = c("Sty", "Lut", "Mar", "Kwie", "Maj", "Cze")),
+  Liczba_przypadkow = c(120, 150, 140, 200, 250, 250, 50, 50, 100, 80, 70, 50),
+  Choroba = rep(c("COVID", "Grypa"), each = 6)
+)
+
+
+p1 <- ggplot(data, aes(x = Miesiac, y = Liczba_przypadkow, color = Choroba, group = Choroba)) +
+  geom_line(size = 1.2) +
+  theme_minimal()+
+  theme(plot.title = element_text(hjust = 0.5, face = "bold"))
+
+p2 <- ggplot(data, aes(x = Miesiac, y = Liczba_przypadkow, color = Choroba)) +
+  geom_point(size = 3) +
+  theme_minimal()+
+  theme(plot.title = element_text(hjust = 0.5, face = "bold"))
+
+p3 <- ggplot(data, aes(x = Miesiac, y = Liczba_przypadkow, fill = Choroba)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  theme_minimal()+
+  theme(plot.title = element_text(hjust = 0.5, face = "bold"))
+
+p4 <- ggplot(data, aes(x = Miesiac, y = Choroba, fill = Liczba_przypadkow)) + 
+  geom_tile() + 
+  scale_fill_gradient(low = "lightblue", high = "red") + 
+  theme_minimal()+
+  theme(plot.title = element_text(hjust = 0.5, face = "bold"))
+
+title1 <- ggplot() + 
+  theme_void() +
+  ggtitle("Wykresy 1 i 2: Liczba przypadków grypy i COVID") +
+  theme(plot.title = element_text(size = 15, hjust = 0.5))
+
+title2 <- ggplot() + 
+  theme_void() +
+  ggtitle("Wykresy 3 i 4: Liczba przypadków grypy i COVID") +
+  theme(plot.title = element_text(size = 15, hjust = 0.5))
+
+(title1 / (p1 | p2) / title2 / (p3 | p4))
+```
+
+
+### Wyniki ankiety
+
+Spośród 20 ankietowanych 10 osób odpowiedziało się za wykresem liniowym, 4 osoby za
+wykresem dot plot, 5 osób za wykresem słupkowym i 1 za wykresem typu heatmap.
+
+
+### Wnioski
+
+Z odpowiedzi ankietowanych można wywnioskować, że wykres typu heatmap, ze względu
+na swoją niedokładność, jest najmniej czytelny. Zgodnie z powszechnymi zasadami,
+wykres liniowy jest uważany za najbardziej przejrzysty i czytelny, zaraz po nim 
+jest wykres słupkowy. Wyniki te pokazują, że najlepszą formą do obserwacji trendu 
+jest linia, prosta do odczytania zjawiska.
+
