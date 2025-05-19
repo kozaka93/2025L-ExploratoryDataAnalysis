@@ -1,0 +1,79 @@
+---
+title: "Eksperyment: Jak duża liczba ozdobników wpływa na odbiór wykresu?"
+output: html_document
+---
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# Ładowanie pakietów
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(ggplot2movies)
+
+# CEL EKSPERYMENTU
+cat("Cel eksperymentu\n\nSprawdzenie, czy użycie dużej ilości kolorów/ozdobników wpływa na odbiór i czytelność wykresu.\n\n")
+
+# PRZEBIEG
+cat("Przebieg\n\nNa podstawie tych samych danych (z ramki `movies` z pakietu `ggplot2movies`) stworzymy dwa podobne wykresy słupkowe.\nJeden z nich będzie tym poprawnym, czyli bez elementów mogących odwrócić zbędnie uwagę od treści, a drugi niepoprawnym.\n\nNastępnie w ankiecie:\n<https://forms.office.com/Pages/ResponsePage.aspx?id=nCJQO3jNiEWbz5e3Yp4vDwkPvycrZ7NEpSlv8X3niYFUNzZEQk9TVVQxVVBVVURaUkhDTTVXMTk1Ny4u>\nsprawdzimy, który wykres jest:\n\n- a) czytelniejszy\n- b) lepiej przyciąga uwagę\n- c) chętniej używany przez ankietowanych\n\n")
+
+# PRZYGOTOWANIE DANYCH
+filtered <- movies %>% filter(year >= 2000, votes >= 5000)
+genre_cols <- c("Action", "Comedy", "Drama", "Romance", "Animation")
+genre_ratings <- lapply(genre_cols, function(g) {
+  filtered %>%
+    filter(.data[[g]] == 1) %>%
+    summarise(genre = g, avg_rating = mean(rating, na.rm = TRUE))
+}) %>% bind_rows()
+
+# WYKRES 1
+cat("Wykres 1 – wersja poprawna\n\n")
+plot(ggplot(genre_ratings, aes(x = genre, y = avg_rating)) +
+  geom_col(fill = "steelblue") +
+  labs(title = "Średnia ocena filmów według gatunku", x = "Gatunek", y = "Średnia ocena") +
+  scale_y_continuous(limits = c(0, 10), breaks = 0:10) +
+  theme_minimal() +
+  theme(plot.background = element_rect(fill = "lightyellow"),
+        plot.title = element_text(hjust = 0.5, size = 16),
+        axis.title = element_text(size = 14),
+        panel.grid.major.y = element_line(color = "gray70", size = 0.6)))
+
+# WYKRES 2
+cat("Wykres 2 – wersja niepoprawna\n\n")
+plot(ggplot(genre_ratings, aes(x = genre, y = avg_rating)) +
+  geom_col(fill = c("orange", "red", "purple", "green", "cyan"),
+           colour = "black", width = 0.7) +
+  labs(title = "Średnia ocena filmów według gatunku", x = "Gatunek", y = "Średnia Ocena") +
+  scale_y_continuous(limits = c(0, 10), breaks = 0:10) +
+  theme(plot.background = element_rect(fill = "lightyellow"),
+        panel.background = element_rect(fill = "gray90"),
+        panel.grid.major = element_line(color = "pink", size = 1.5),
+        axis.title = element_text(face = "bold", size = 14, color = "blue"),
+        plot.title = element_text(size = 20, color = "red", hjust = 0.5)))
+
+# WYNIKI ANKIETY
+cat("Wyniki ankiety\n\nNa podstawie 17 odpowiedzi:\n\n1. Czytelność: Wykres 1 – 15 głosów, Wykres 2 – 2 głosy\n2. Przyciąganie uwagi: Wykres 1 – 5 głosów, Wykres 2 – 12 głosów\n3. Chęć użycia: Wykres 1 – 13 głosów, Wykres 2 – 4 głosy\n\n")
+
+odpowiedzi <- data.frame(
+  pytanie = c("Czytelność", "Przyciąganie uwagi", "Czy byś użył/a?"),
+  wykres_1 = c(15, 5, 13),
+  wykres_2 = c(2, 12, 4)
+)
+
+odpowiedzi_long <- odpowiedzi %>%
+  pivot_longer(cols = c(wykres_1, wykres_2),
+               names_to = "wykres", values_to = "glosy") %>%
+  mutate(wykres = recode(wykres,
+                         wykres_1 = "Wykres 1",
+                         wykres_2 = "Wykres 2"))
+
+plot(ggplot(odpowiedzi_long, aes(x = pytanie, y = glosy, fill = wykres)) +
+  geom_col(position = "dodge") +
+  scale_fill_manual(values = c("Wykres 1" = "steelblue", "Wykres 2" = "red")) +
+  labs(title = "Porównanie ocen wykresów w ankiecie (17 odpowiedzi)",
+       x = "Pytanie ankietowe", y = "Liczba głosów", fill = "Typ wykresu") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5, size = 16),
+        axis.title = element_text(size = 13)))
+
+# WNIOSKI
+cat("Wnioski\n\nWidzimy, że wykres wykonany konwencjonalnie byłby chętniej użyty przez ankietowanych oraz uznany za bardziej czytelny.\nZ drugiej strony – wykres, który zawiera więcej kolorów i ozdobników – silniej przyciąga ich uwagę.\n")
