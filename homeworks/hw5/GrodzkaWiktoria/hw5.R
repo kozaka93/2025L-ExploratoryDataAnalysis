@@ -54,8 +54,24 @@ pie(df2$procent, col=colors, labels=paste0(df2$procent, "%"),
     labeldist=0.5, radius=0.8,
     main="Analiza wpływu wieku na liczbę złożonych reklamacji")
 legend("topright", inset=c(-0.5,0), legend = df2$age2, fill = colors, title="Przedział wiekowy", xpd=TRUE, bty="n")
+#------------------------------kolowy3d
+par(mar = c(4, 4, 2, 4)) 
+pie3D(df2$procent,
+      labels=paste0(df2$procent, "%"),
+      explode = 0.1,              
+      col = colors,
+      main = "Analiza wpływu wieku na liczbę złożonych reklamacji",
+      labelcex = 0.8)
+legend("topright", inset=c(-0.8,0), legend = df2$age2, fill = colors, title="Przedział wiekowy", xpd=TRUE, bty="n")
 #------------------------------slupkowy
 ggplot(df2, aes(x = age2, y = count)) +
   geom_bar(stat = "identity") +
   labs(title = "Analiza wpływu wieku na liczbę złożonych reklamacji", y = "Liczba reklamacji", x = "Przedział wiekowy") +
   theme(axis.text.x = element_text(angle = 20, hjust = 1,margin = margin(r = 0)))
+#------------------------------slupkowykolorowy
+ggplot(df2, aes(x = age2, y = count, fill=age2)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Analiza wpływu wieku na liczbę złożonych reklamacji", y = "Liczba reklamacji", fill="Przedział wiekowy") +
+  theme(axis.title.x = element_blank(),axis.text.x = element_blank(),        
+        axis.ticks.x = element_blank())+
+  scale_fill_brewer(palette = "Set3")
