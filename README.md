@@ -189,7 +189,7 @@ Wstęp do eksploracji danych składa się z:
     <td>20.maj</td>
     <td>2</td>
     <td>lab</td>
-    <td>Python: pandas, numpy</td>
+    <td><a href="https://github.com/kozaka93/2025L-ExploratoryDataAnalysis/tree/main/labs/lab12">Python: pandas, numpy</a></td>
     <td><a href="https://github.com/kozaka93/2025L-ExploratoryDataAnalysis/issues/308">PD5</a> (6p)</td>
   </tr>
   <tr>
