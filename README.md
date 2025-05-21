@@ -196,7 +196,7 @@ Wstęp do eksploracji danych składa się z:
     <td>21.maj</td>
     <td>2</td>
     <td>wykład</td>
-    <td>Wizualizacja grafów, analiza tekstu, dashboardy, historia, IBCS</td>
+    <td><a href="https://github.com/kozaka93/2025L-ExploratoryDataAnalysis/blob/main/lectures/L05-graphs_dashboards_history.pdf">Wizualizacja grafów, dashboardy, historia</a></td>
     <td></td>
   </tr>
   <tr>
