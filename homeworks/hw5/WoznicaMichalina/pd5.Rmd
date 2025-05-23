@@ -1,0 +1,65 @@
+---
+title: 'PD5: eksperyment'
+author: "Michalina Woźnica"
+date: "2025-05-12"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+    theme: united
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(dplyr)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Wstęp
+\subsection{Treść zadania}
+\noindent W ramach pracy domowej należy przygotować \textit{K} eksperymentów, sprawdzających czy określone problemy z czytaniem danych wciąż występują (problemy: iluzje na wykresach, błędy w odczytywaniu wykresu kołowego, błędy w pokazywaniu danych za pomocą wykresów 3D, problemy z tytułami na wykresie) (\textit{K} to liczba osób w zespole tj. zespół z 3 osobami powinien zrobić 3 eksperymenty).
+
+\noindent Następnie należy przetestować na przynajmniej 15 innych osobach czy dany problem występuje, np. przeprowadzając ankietę typu czy lepszy jest wykres A czy B.
+
+\noindent Celem pracy jest sprawdzenie czy ,,dobre praktyki'' opracowane lata temu (słupki lepsze niż kąty, kolor wykorzystywany z umiarem, unikanie ozdobników), faktycznie działa w społeczeństwie, które wykresami karmione jest od urodzenia.
+
+\subsection{Opis przeprowadzonego eksperymentu}
+Przeprowadzony eksperyment miał na celu sprawdzenie, który z wykresów - kołowy czy słupkowy - jest według respondentów lepszy i bardziej precyzyjny w przedstawianiu danych. Dodatkowo wykres słupkowy, w przeciwieństwie do wykresu kołowego, został zaprezentowany w odcieniach szarości, co pozwoliło uwzględnić również wpływ kolorystyki na odbiór informacji. Ankietowani zostali poproszeni o ocenę dwóch wykresów przedstawiających te same dane; jednego w formie wykresu kołowego z zastosowaniem kolorów oraz drugiego w 
+
+Celem eksperymentu było sprawdzenie, który z wykresów uczestnicy uznają za bardziej czytelny, łatwiejszy do interpretacji i dokładniejszy pod względem przedstawienia proporcji. Uczestnicy ankiety mieli wskazać, który z wykresów lepiej oddaje relacje pomiędzy kategoriami oraz co skłoniło ich do dokonania wyboru.
+
+Danymi użytymi w eksperymencie była ramka danych \textit{diamonds}, wbudowana w środowisko R. Zawiera ona informacje o ponad 50 tysiącach diamentów, w tym ich masa karatową, cenę, kolor, czystość i jakość szlifu. Oba wykresy przedtawiają liczbę diamentów w zależności od szlifu.
+
+## Wykres Kołowy
+```{r pie-chart}
+diamonds %>% 
+  group_by(cut) %>% 
+  summarise(count = n()) %>% 
+  ggplot(aes(x = "", y = count, fill = cut))+
+  geom_bar(stat = "identity", width = 1, color = "black") +
+  coord_polar("y") +
+  theme_void() +
+  labs(title = "cut of diamonds")+
+  scale_fill_brewer(palette = "Blues")
+```
+ 
+## Wykres słupkowy
+```{r bar-chart}
+ggplot(diamonds, aes(x = cut)) +
+  geom_bar() +
+  theme_minimal() +
+  labs(title = "number of diamonds depending on the cut", x = "cut", y ="count")
+
+```
+
+## Wyniki eksperymentu
+
+Z 17 uzyskanych odpowiedzi aż 10 osób zagłosowało za preferencją wykresu słupkowego. Najczęściej pojawiającymi się odpowiedziami na pytanie, dlaczego ankietowani dokonali takiego wyboru, były: czytelność, przejrzystość wykresu, lepsza interpretacja proporcji, a także łatwość porównania wartości między kategoriami. 
+
+Osoby opowiadające się za wykresem kołowym również wskzali czytelnośc wykresu jako głowną z przyczyn ich wyboru. Podkreślali, że wykres lepiej reprezentuje stosunki między szlifami, jest atrakcyjniejszy wizualnie , a odczyt informacji jest szybki i łatwiejszy w odbiorze dzięki użytym kolorom. 
+
+## Podsumowanie 
+Celem eksperymentu było zweryfikowanie, czy znane zasady wizualizacji danych, takie jak unikanie wykresów kołowych, ograniczanie liczby kolorów czy preferowanie wykresów słupkowych – są zgodne z rzeczywistym odbiorem społecznym. Z przeprowadzonego eksperymentu wynika, że większość ankietowanych wybiera minimalistyczy wykres słupkowy, uznając go za czytelniejszy i łatwiejszy w odbiorze. Jednocześnie duża część respondentów uznała wykres kołowy za lepszy w interpretacji i łatwiejszy w odczycie informacji. 
+
+Pomimo, że większość ankietowanych opowiedziała się za wykresem słupkowym, nie była to zdecydowana przewaga, ponieważ znaczna część ankietowanych uznała wykres kołowy za ich faworyta. Uzyskane wyniki potwierdzają, że zalecane praktyki w projektowaniu wykresów są nadal aktualne, choć jednocześnie sugerują, że odbiór wizulizacji danych danych mocno zależy również od preferencji, czy przyzwyczajeń. 
