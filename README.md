@@ -218,7 +218,7 @@ Wstęp do eksploracji danych składa się z:
     <td>2</td>
     <td>lab</td>
     <td>Python: plotly</td>
-    <td>PD6 (6p)</td>
+    <td><a href="https://github.com/kozaka93/2025L-ExploratoryDataAnalysis/issues/352">PD6</a> (6p)</td>
   </tr>
   <tr>
     <td rowspan="2">04.cze</td>
