@@ -189,21 +189,21 @@ Wstęp do eksploracji danych składa się z:
     <td>20.maj</td>
     <td>2</td>
     <td>lab</td>
-    <td>Python: pandas, numpy</td>
+    <td><a href="https://github.com/kozaka93/2025L-ExploratoryDataAnalysis/tree/main/labs/lab12">Python: pandas, numpy</a></td>
     <td><a href="https://github.com/kozaka93/2025L-ExploratoryDataAnalysis/issues/308">PD5</a> (6p)</td>
   </tr>
   <tr>
     <td>21.maj</td>
     <td>2</td>
     <td>wykład</td>
-    <td>Wizualizacja grafów, analiza tekstu, dashboardy, historia, IBCS</td>
+    <td><a href="https://github.com/kozaka93/2025L-ExploratoryDataAnalysis/blob/main/lectures/L05-graphs_dashboards_history.pdf">Wizualizacja grafów, dashboardy, historia</a></td>
     <td></td>
   </tr>
   <tr>
     <td>27.maj</td>
     <td>2</td>
     <td>lab</td>
-    <td>Python: matplotlib, seaborn</td>
+    <td><a href="https://github.com/kozaka93/2025L-ExploratoryDataAnalysis/tree/main/labs/lab13">Python: matplotlib, seaborn</a></td>
     <td></td>
   </tr>
   <tr>
@@ -218,7 +218,7 @@ Wstęp do eksploracji danych składa się z:
     <td>2</td>
     <td>lab</td>
     <td>Python: plotly</td>
-    <td>PD6 (6p)</td>
+    <td><a href="https://github.com/kozaka93/2025L-ExploratoryDataAnalysis/issues/352">PD6</a> (6p)</td>
   </tr>
   <tr>
     <td rowspan="2">04.cze</td>

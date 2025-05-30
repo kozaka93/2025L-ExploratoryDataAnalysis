@@ -1,0 +1,182 @@
+---
+title: "Raport z eksperymentu"
+author: "Mateusz Bujnowski"
+date: "2025-05-17"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+    theme: united
+  pdf_document:
+    toc: true
+---
+
+```{r setup, include=FALSE, message=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(readxl)
+library(gridExtra)
+library(ggtext)
+
+```
+
+# Wstęp
+
+## Zadanie
+
+Należy przygotować eksperyment, sprawdzający czy określone problemy z czytaniem danych wciąż występują (problemy takie jak: iluzje na wykresach, błędy w odczytywaniu wykresu kołowego, błędy w pokazywaniu danych za pomocą wykresów 3D, problemy z tytułami na wykresie). Następnie należy przetestować na przynajmniej 15 innych osobach czy dany problem występuje, np. przeprowadzając ankietę.
+
+## Cel
+
+Celem pracy jest sprawdzenie czy "dobre praktyki" opracowane lata temu (słupki lepsze niż kąty, kolor wykorzystywany z umiarem, unikanie ozdobników), faktycznie działa w społeczeństwie, które wykresami karmione jest od urodzenia.
+
+# Eksperyment
+
+## Opis eksperymentu
+
+Eksperyment polegał na sprawdzeniu wśród odbiorców, który wykres jest prostszy do odczytania - wykres kołowy czy wykres słupkowy. W tym celu przygotowano wykresy przedstawiające te same dane w dwóch różnych formach. Uczestnicy eksperymentu zostali poproszeni o ocenę, który wykres jest bardziej czytelny i łatwiejszy do zrozumienia. Poprzedzały to pytania dotyczące odczytu poszczególnych informacji z wykresu kołowego. Dotyczyły one tych samych danych przedstawionbych na wykresie kołowym z uwzględnieniem kolorów, bez informacji o udziale procentowym każdego z przedziałów, oraz na wykresie słupkowym w dwóch kolorzach.
+
+## Eksperyment - wykresy
+
+Dane do stworzenia wykresów pochodziły z wbudowanego zbioru danych `Titanic`. Wykresy przedstawiają liczbę dorosłych na pokładzie statku Titanic, którzy przeżyli, podzieloną na płeć i klasę.
+
+### Wykres kołowy
+
+```{r}
+# Wykres kołowy
+dane <- as.data.frame(Titanic) 
+dane <- dane[25:32, ] %>% select(- c(Age, Survived))
+label <- paste(dane$Class, dane$Sex, sep = ", ")
+dane1 <-  aggregate(Freq ~ label, data = dane, sum)
+pie(
+  dane1$Freq,
+  labels = dane1$label,
+  main = "Titanic: Passengers by Class and Gender",
+  col = rainbow(length(dane1$Freq))
+)
+```
+
+#### Wykres słupkowy z procentami.
+
+Pokazuje poprawność odpowiedzi w ankiecie.
+
+```{r}
+# Wykres kołowy z procentami
+dane <- as.data.frame(Titanic) 
+dane <- dane[25:32, ] %>% select(- c(Age, Survived))
+label <- paste(dane$Class, dane$Sex, sep = ", ")
+dane1 <-  aggregate(Freq ~ label, data = dane, sum)
+pct <- round(100 * dane1$Freq / sum(dane1$Freq), 1)
+labels_pct <- paste(dane1$label, pct, "%")
+pie(
+  dane1$Freq,
+  labels = labels_pct,
+  main = "Titanic: Passengers by Class and Gender",
+  col = rainbow(length(dane1$Freq))
+)
+```
+
+### Wykres słupkowy
+
+```{r}
+# Wykres słupkowy
+dane <- as.data.frame(Titanic) %>%
+  slice(25:32) %>%
+  select(-c(Age, Survived)) %>%
+  group_by(Class, Sex) %>%
+  summarise(Freq = sum(Freq), .groups = "drop")
+ggplot(dane, aes(x = Class, y = Freq, fill = Sex)) +
+  geom_col(position = position_dodge(width = 0.6), width = 0.6) + 
+  labs(
+    title = "Titanic: Passengers by Class and Gender",
+    x = "Class",
+    y = "Number of Passengers",
+    fill = "Gender"
+  ) +
+  theme_minimal() +
+  scale_fill_manual(values = c("green", "orange")) +
+  scale_y_continuous(expand = expansion(mult = 0.05),
+                     breaks = seq(0, 220, by = 20))
+```
+
+## Wyniki
+
+W przeprowadzonym badaniu wykres słupkowy był w dwóch kolorach, co pozwoliło na odczytanie wykresu również dla osób z zaburzeniami widzenia kolorów. Respondenci jednoznacznie stwierdzili, że wykres słupkowy jest bardziej czytelny i łatwiejszy do zrozumienia niż wykres kołowy. Z pośród 18 osób, w pytaniach z 4 ospowiedziami poprawnie odpowiedziała mniej niż połowa, dla pytań Tak/Nie było to mniej więcej 10 osób. Aż 17 na 18 badanych osó potwierdziło, że prostszy jest odczyt wykresu słupkowego. Wskazywali również, że wykres kołowy wprowadzał ich w błąd i był trudny do zrozumienia. Dodatkowym utrudnieniem była duża liczba przedziałów, mimo tego, że zbliżonych wielkością do siebie podziałów było tylko kilka.
+
+### Tabelka z udzielonymi odpowiedziami
+```{r}
+tabelka <- read_xlsx('Wyniki ankiety.xlsx')
+print(tabelka, row.names = F)
+
+```
+
+### Wykresy przedstawiające odpowiedzi wraz z poprawnymi odpowiedziami
+```{r}
+tabelka_long <- tabelka[1:18,] %>%
+ rename(id = Odpowiedzi) %>%
+  pivot_longer(
+    cols = starts_with("Pytanie"),
+    names_to = "Pytanie",
+    values_to = "Odpowiedz" )
+
+pytania_tytuly <- c(
+  "Czy więcej jest kobiet\nniż mężczyzn?",
+  "W trzeciej klasie więcej\njest mężczyzn od kobiet?",
+  "Która z części\njest trzecią największą?",
+  "W którym przedziale procentowym\nmieści się część „Crew, Male”?",
+  "Czy część „1st, Male”\nprzekracza 8%?",
+  "Czy wykres słupkowy\njest prostszy do odczytu niż kołowy?"
+)
+
+poprawne_odp <- tabelka[19, paste0("Pytanie ", 1:5)] %>% 
+  unlist(use.names = FALSE) %>% 
+  as.character()
+
+wykresy <- tabelka_long %>%
+  group_by(Pytanie) %>%
+  group_split() %>%
+  lapply(function(df) {
+  idx <- as.integer(sub("Pytanie", "", df$Pytanie[1]))
+  odpetyk <- unique(df$Odpowiedz)
+  
+  # Ustal poziomy w tej samej kolejności
+  df$Odpowiedz <- factor(df$Odpowiedz, levels = odpetyk)
+  
+  kolory <- rainbow(length(odpetyk))
+  
+  labels <- setNames(
+    ifelse(
+      idx <= 5 & odpetyk == poprawne_odp[idx],
+      paste0(odpetyk, " ✅"),
+      odpetyk
+    ),
+    odpetyk
+  )
+
+  ggplot(df, aes(x = "", fill = Odpowiedz)) +
+    geom_bar(width = 1) +
+    coord_polar(theta = "y") +
+    scale_fill_manual(values = setNames(kolory, odpetyk),
+                      labels = labels) +
+    labs(title = pytania_tytuly[idx]) +
+    theme_void() +
+    theme(
+      legend.position = "right",
+      plot.title = element_text(size = 10, hjust = 0.5),
+      legend.text = element_text(size = 8),
+      legend.title = element_text(size = 8)
+    )
+})
+
+gridExtra::grid.arrange(grobs = wykresy, ncol = 2)
+
+
+```
+
+# Podsumowanie (Wnioski)
+
+Celem eksperymentu było sprawdzenie, czy powszechnie przyjęte zasady wizualizacji danych – takie jak unikanie wykresów kołowych, ograniczanie liczby używanych kolorów czy preferowanie wykresów słupkowych – znajdują potwierdzenie w rzeczywistym odbiorze społecznym. Wyniki badania pokazują, że większość uczestników wskazała wykres słupkowy jako bardziej czytelny i przystępny. Nie ma problemó z odczytaniem kątó, które jest dla nas uciążliwe. Również możemy zredukować liczbę koloró, co pomaga osobom z zaburzeniami widzenia kolorów. Należy również pamiętać, że wykresy odczytujemy całe życie i są pewne przyzwyczsajenia, które nie zawsze się pokrywają z tym co jest najlepsze dla innych osób oraz ze schematami opracowanymi przez naukowców.

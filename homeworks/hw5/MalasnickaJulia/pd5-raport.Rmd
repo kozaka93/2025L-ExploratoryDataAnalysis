@@ -1,0 +1,103 @@
+---
+title: "Raport - praca domowa 5"
+author: "Julia Małaśnicka"
+output: pdf_document
+header-includes:
+  - \usepackage{graphicx}
+  - \usepackage{amsmath}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+library(ggplot2)
+library(dplyr)
+library(RColorBrewer)
+```
+
+## Wprowadzenie
+
+W tej pracy domowej zbadałam, czy prawdą jest, że ludzie wolą porównywać dane na wykresach słupkowych niż kołowych. Sprawdziłam, czy faktycznie łatwiejsze dla człowieka jest porównywanie słupków niż kątów, szczególnie przy zbliżonych wartościach.
+
+W tym celu przeprowadziłam ankietę na 15 osobach, dając im do odczytania dane z wykresu kołowego i wykresu słupkowego, a następnie możliwość ich porównania. Utworzyłam przykładowy zestaw danych (dotyczący ulubionych sportów dzieci w klasach ósmych), który został przedstawiony za pomocą obu typów wykresów w celu oceny ich czytelności.
+
+Ankieta zawierała następujące pytania:
+
+\begin{enumerate}
+\item Który sport jest ulubionym sportem największej liczby uczniów? (pytanie na podstawie wykresu kołowego)
+\item Który sport jest drugim najpopularniejszym? (pytanie na podstawie wykresu słupkowego)
+\item Który wykres jest bardziej czytelny? (pytanie porównawcze)
+\item Uzasadnij swoją odpowiedź dotyczącą czytelności wykresów. (pytanie otwarte)
+\item Jak oceniasz czytelność wykresu kołowego w skali 1–5?
+\item Jak oceniasz czytelność wykresu słupkowego w skali 1–5?
+\end{enumerate}
+
+Dzięki temu uzyskałam zarówno dane dotyczące poprawności odczytu informacji z wykresów, jak i subiektywne opinie uczestników na temat ich czytelności.
+
+## Wykresy
+
+```{r ankieta slupkowy, echo=FALSE}
+# Tworzę bazę danych, z której utworzę wykresy do ankiety
+sport <- c("Piłka nożna", "Koszykówka", "Siatkówka", "Pływanie", "Bieganie")
+liczba <- c(24, 22, 21, 18, 15)
+data = data.frame(sport, liczba)
+
+# Wykres słupkowy
+ggplot(data, aes(x = sport, y = liczba)) +
+  geom_bar(stat = "identity", fill = "#c969a1") +
+  labs(title = "Ulubiony sport dzieci w klasach 8", y = "Liczba uczniów", x = NULL) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r ankieta kolowy, echo=FALSE}
+# Wykres kołowy
+ggplot(data, aes(x = "", y = liczba, fill = sport)) +
+  geom_bar(width = 1, stat = "identity") +
+  coord_polar("y") +
+  geom_text(aes(x=1.2, label = sport),
+            position = position_stack(vjust = 0.5),
+            size = 4) +
+  labs(title = "Ulubiony sport dzieci w klasach 8") +
+  scale_fill_brewer(palette = "Pastel1") +
+  theme_void() +
+  theme(legend.position = "none")
+
+```
+
+## Wyniki
+
+Przeprowadzone badanie potwierdziło, że wykres słupkowy jest bardziej czytelny od wykresu kołowego przy zbliżonych danych. Ludziom ciężej jest porównywać kąty niż słupki (odcinki), co odzwierciedlają ich odpowiedzi w ankiecie.
+
+```{r odpowiedzi kolowy, echo=FALSE}
+# Dane z ankiety dotyczące liczby poprawnych odpowiedzi na pytanie sprawdzające czytelność wykresów
+poprawnosc <- data.frame(
+  wykres = rep(c("Kołowy", "Słupkowy"), each = 2),
+  Odpowiedź = rep(c("Poprawna", "Niepoprawna"), times = 2),
+  liczba = c(9, 6, 15, 0)
+)
+
+# Wykres przedstawiający powyższe dane
+ggplot(poprawnosc, aes(x = wykres, y = liczba, fill = Odpowiedź)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Poprawność odpowiedzi dla obu wykresów",
+       subtitle = "(na pytanie sprawdzające czytelność wykresów)",
+       y = "Liczba odpowiedzi", x = "Poprawność odpowiedzi") +
+  theme_minimal()
+```
+
+```{r odpowiedzi ocena, echo=FALSE}
+# Dane z ankiety dotyczące oceny czytelności obu wykresów
+czytelnosc <- data.frame(
+  wykres = c("Kołowy", "Słupkowy"),
+  srednia_ocena = c(2.13, 4.87)
+)
+
+# Wykres słupkowy przedstawiający powyższe dane
+ggplot(czytelnosc, aes(x = wykres, y = srednia_ocena)) +
+  geom_bar(stat = "identity", width = 0.6, fill = "#a39e5f") +
+  labs(title = "Średnia ocena czytelności wykresów", y = "Średnia ocena", x = NULL) +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+Jak widać na wykresach powyżej na pytanie sprawdzające czytelność wykresu kołowego odpowiedziało poprawnie tylko 60% ankietowanych. Natomiast na analogiczne pytanie dotyczące wykresu słupkowego 100% osób udzieliło poprawnej odpowiedzi. Porównując czytelność obu wykresów, wszyscy ankietowani zaznaczyli większą czytelność wykresu słupkowego (ocena 4.87) niż kołowego (ocena 2.13). Potwierdza to tezę, że wykresy słupkowe są bardziej czytelne przy zbliżonych danych.

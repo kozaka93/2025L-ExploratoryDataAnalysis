@@ -1,0 +1,146 @@
+---
+title: "Praca domowa 5"
+author: "Maciej Barańczyk"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+    theme: united
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(readxl)
+library(dplyr)
+library(ggplot2)
+library(forcats)
+library(scales)
+library(stringr)
+library(tidyr)
+library(lemon)
+
+knit_print.data.frame <- lemon_print
+
+df<-read_excel("Wypadki drogowe według ważniejszych przyczyn.xlsx")
+
+
+df_filtered<-df %>% 
+  filter(Wojewodztwa=="Poland") %>% 
+  select(-c(`Wina kierujących pojazdami`,Wojewodztwa))
+
+df2 <- data.frame(colnames(df_filtered),as.vector(t(df_filtered[1,])))
+colnames(df2) <- c('Przyczyna','Liczba')
+df2$Przyczyna<-fct_reorder(df2$Przyczyna,df2$Liczba)
+
+df2_pie <- df2 %>%
+  mutate(Percent = Liczba / sum(Liczba) * 100,
+         Label = paste0(Przyczyna, "\n", round(Percent, 1), "%"))
+
+wyniki <- read_excel("Wybór lepszej reprezentacji danych.xlsx")
+
+wyniki<-wyniki %>% 
+  mutate(wybór=case_when(Pie=="Tak"~"kołowy",
+                         TRUE~"słupkowy"))
+
+```
+## Badanie
+W swoim badaniu skupiłem się na porównaniu tego jak ludzie oceniają kolorowy wykres kołowy względem poprawnego wykresu słupkowego. Do wizualizacji wybrałem dane dotyczące powodów wypadków w Polsce w roku 2023.
+
+## Wykres kołowy
+Poniżej przedstawiony wykres kołowy zawiera wiele kolorów, podwojoną informację w postaci procentów i wycinków koła. Jest on trudny w odczytaniu i nie daje nam informacji o ilości wypadków, która w znaczny sposób może zmienić postrzeganie przez nas danej statystki.
+
+```{r wykres 1, message=FALSE}
+
+ggplot(df2_pie, aes(x = "", y = Liczba, fill = Przyczyna)) +
+  geom_bar(stat = "identity", width = 1, color="white") +
+  coord_polar(theta = "y", start=0) +
+  geom_text(aes(label = paste0(round(Percent, 1), "%")),
+            position = position_stack(vjust = 0.5), color = "white", size=4) +
+  scale_fill_discrete()+
+  labs( 
+    title = "Przyczyny wypadków drogowych w Polsce\n w roku 2023",
+    subtitle = "Na podstawie raportu GUS"~italic('Transport - wyniki działalności w 2023 roku'),
+    fill = "Przyczyna"
+  ) +
+  theme_void() +
+  theme(
+    plot.title = element_text(size = 11.5, hjust = 0.5,face="bold"),
+    plot.subtitle = element_text(size = 8, hjust = 0.5),
+    legend.title  = element_text(size=10,face="bold")
+  )
+
+```
+
+## Wykres słupkowy
+Wykres słupkowy przedstawia w dobry sposób proporcje, dosyć dokładne liczby i pozwala nam na szybkie odczytanie legendy. Ograniczona kolorystyka poprawia łatwość w odczytaniu danych
+```{r wykres 2, message=FALSE}
+ggplot(df2, aes(x=Przyczyna, y = Liczba)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  labs(title = "Liczba wypadków drogowych według przyczyny w Polsce w roku 2023",
+       subtitle = "Na podstawie raportu GUS"~italic('Transport - wyniki działalności w 2023 roku'),
+       x = "Przyczyna", y = "Liczba")+ 
+  scale_x_discrete(labels = label_wrap(20)) +
+  theme_minimal()+
+  theme(plot.title = element_text(size=12,hjust=0.4,face="bold"),
+        plot.subtitle = element_text(size=10,hjust=0.4),
+        axis.text.y=element_text(size=10),
+         axis.title=element_text(size=12))
+```
+
+## Wyniki
+Badanie zostało przeprowadzone na ponad 30 osobach za pomocą ankiety. Wyniki prezentowały się następująco:
+```{r wyniki, message=FALSE,render=lemon_print}
+wyniki %>% 
+  group_by(wybór) %>% 
+  summarise(ilość=n())
+```
+Żaden z wykresów nie uzyskał przewagi wśród głosujących, czyli mankamenty wykresu kołowego są akceptowalne dla części społeczeństwa.
+Teraz przedstawię wyniki w podziale na płeć i wiek.
+```{r wyniki podzial, message=FALSE}
+ggplot(wyniki,aes(x=wybór,fill=`Podaj płeć`))+
+  geom_bar(position='dodge2')+
+  scale_fill_manual(
+    values=c("red","darkblue")
+  )+
+  labs(title = "Wybór wykresu w zależności od płci",
+       y="Liczba",
+       x="wybór",
+       fill="Płeć")+
+  theme_bw()
+
+ggplot(wyniki,aes(x=wybór,fill=Wiek))+
+  geom_bar(position='dodge2')+
+  scale_fill_manual(
+    values=c("red","darkblue","purple")
+  )+
+  labs(title = "Wybór wykresu w zależności od wieku",
+       y="Liczba",
+       x="wybór")+
+  theme_bw()
+```
+
+Jak widać kobiety częściej decydują się na wybór wykresu kołowego. Może na to wpływać kolorystyka wykresu, pokazane od razu procenty. Wśród nastolatków zdecydowana większość wybiera wykres słupkowy. Są to osoby mające częsty kontakt z wykresami różnej postaci i wiedzą one jak powinno wyglądać dobre przedstawienie danych. Osoby w wieku 20-29 decydowały się na wybór wykresu kołowego być może ze względu na pozorną szybkość uzyskania informacji, która była od razu wyświetlona. 
+
+## Powody wyboru
+Na koniec pokażę, co przemawiało za wyborem danego wykresu wśród ankietyzowanych.
+```{r powody, message=FALSE,render=lemon_print}
+ wyniki %>%
+     filter(wybór=="kołowy") %>% 
+     select(`Powód wyboru wykresu`) %>%
+     separate_rows(`Powód wyboru wykresu`, sep = ";") %>%
+     mutate(Powód_koło = str_trim(`Powód wyboru wykresu`)) %>%
+     count(Powód_koło, sort = TRUE) %>% 
+     filter(Powód_koło!="",n!=1)
+
+ wyniki %>%
+     filter(wybór=="słupkowy") %>% 
+     select(`Powód wyboru wykresu`) %>%
+     separate_rows(`Powód wyboru wykresu`, sep = ";") %>%
+     mutate(Powód_słup = str_trim(`Powód wyboru wykresu`)) %>%
+     count(Powód_słup, sort = TRUE) %>% 
+     filter(Powód_słup!="",n!=1)
+```
+Większość ankietyzowanych uważała, że dane na wybranym wykresie były czytelne oraz szybko przez nich zrozumiane. Mnogość kolorów na wykresie kołowym była ważnym powodem dla osób wybierających ten wykres. Kolorystyka okazała się ważniejsza od szybkości zrozumienia danych.
