@@ -1,0 +1,193 @@
+---
+title: "Dobór skali kolorów na wizualizacjach"
+author: "Jan Pieczywok"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+    theme: united
+---
+<style>
+body {
+  font-size: 12pt;
+}
+</style>
+
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(dplyr)
+library(ggplot2)
+library(maps)
+library(viridis)
+library(scales)
+library(knitr)
+library(kableExtra)
+
+data("USArrests") #korzystamy z ramki danych USArrests
+
+us_arrests = USArrests
+us_arrests$region = tolower(rownames(USArrests))
+
+mapa = map_data("state")
+
+mapa_df = mapa %>%
+  left_join(us_arrests, by = "region")
+
+stany = mapa_df %>% group_by(region) %>% summarise(long = mean(range(long)), lat = mean(range(lat)))
+
+punkty = stany %>% filter(region %in% c("north dakota", "maine")) %>%
+  mutate(label = ifelse(region == "north dakota", "X", "Y"))
+
+
+```
+
+## Opis zagadnienia
+
+W eksperymencie chcemy zbadać w praktyce, jak **wybór skali barw** wpływa na interpretację przedstawionych danych i może prowadzić do **błędnych wniosków**. Badamy efekt percepcji barw - 
+odbiorcy mogą błędnie przypisywać większe różnice liczbowe miejscom, gdzie kolory na mapie różnią się mocno wizualnie — nawet jeśli wartości są zbliżone. Skale niemonotoniczne, takie jak tęczowa, mogą zatem wprowadzać złudzenie ostrych granic i utrudniać prawidłowe określenie wartości skrajnych, ponieważ brak w nich jednoznacznego kierunku narastania koloru (np. od jasnego do ciemnego). To może powodować problemy w szybkim rozpoznaniu obszarów z najwyższymi lub najniższymi wartościami.
+
+Skupimy się na porównaniu dwóch podejść do wizualizacji tych samych danych geograficznych:
+
+- **Wizualizacja zgodna z percepcją ludzkiego oka:**  
+  wykorzystuje ciągłą skalę kolorów, w której zmiany barwy odpowiadają proporcjonalnym zmianom wartości danych. Kolory są ułożone tak, aby były jednoznacznie interpretowalne percepcyjnie – najczęściej od jasnych (niższe wartości) do ciemnych (wyższe wartości).
+
+- **Wizualizacja wielobarwna (tęczowa):**  
+  oparta na niemonotonicznej skali kolorów, przechodzącej przez wiele różnych odcieni.  
+  Taka skala może sugerować nieistniejące ostre granice lub różnice w danych, potencjalnie wprowadzając odbiorcę w błąd.
+
+## Cel
+Celem eksperymentu jest ustalenie, czy w przypadku danych ciągłych z relacją porządkową zastosowanie skali barw o **monotonnie** zmieniającym się natężeniu, w **ograniczonym** zakresie (powrzechnie uznawana za stosowną metodę przy tego typu wizualizacjach) ułatwi poprawną interpretację danych z mapy w porównaniu z zastosowaniem **wielobarwnej**, **niemonotonicznej** (tutaj tęczowej) skali kolorów. Koncentrujemy się na efektywności identyfikowania wartości skrajnych oraz zdolności porównywania wartości między poszczególnymi regionami.
+
+## Opis eksperymentu 
+Eksperyment przeprowadzamy na grupie 15 osób. Uczestnikom prezentujemy dwie mapy przedstawiające liczbę morderstw na 100 tysięcy mieszkańców w różnych stanach USA (na podstawie wbudowanej ramki danych "Usarrests").
+
+- **Wersja A** – mapa z zastosowaniem klasycznej, monotonicznej skali barw, w której kolory przechodzą stopniowo od jasnego żółtego do ciemnoniebieskiego.
+
+- **Wersja B** – mapa z wykorzystaniem tęczowej, niemonotonicznej skali kolorów.
+
+Na obu wersjach mapy dodatkowo zaznaczamy przez "X" i "Y" odpowiednio stany Północną Dakotę i Maine. 
+
+Następnie uczestnicy odpowiadają na poniższe pytania:
+
+1. Czy mapa A sugeruje, że liczba morderstw w stanach X i Y znacząco się różni? 
+2. Czy mapa B sugeruje, że liczba morderstw w stanach X i Y znacząco się różni?
+3. Na której mapie łatwiej jest Ci zidentyfikować stany o najwyższej i najniższej liczbie morderstw?
+4. Na której mapie szybciej odczytałeś dane potrzebne do odpowiedzi na powyższe pytania?
+5. Kolorystyka której z dwóch map wydaje Ci się estetycznie ładniejsza?
+
+Ankietę przeprowadzamy za pomocą Google Forms ([link](https://docs.google.com/forms/d/e/1FAIpQLSdefPbrKeX0KUsAUyNFycdFMybf74qHmxDMmNcMzGT1hZbfxA/viewform)). Poniżej przedstawiam wizualizacje, które były ze sobą porównywane.
+
+```{r mapa-szara}
+ggplot(mapa_df, aes(long, lat, group = group, fill = Murder)) +
+  geom_polygon(color = "white") +
+  coord_fixed(1.3) +
+  scale_fill_viridis(
+    option = "D",  
+    direction = -1,
+    name = "Morderstwa\n(na 100 tys.)"
+  ) +
+  labs(title = "Wizualizacja A – Liczba morderstw w USA na 100 tys. mieszkańców",
+    x = "Długość geograficzna",
+    y = "Szerokość geograficzna") +
+  geom_text(
+    data = punkty,
+    aes(x = long, y = lat, label = label),
+    inherit.aes = FALSE,
+    size = 6, fontface = "bold", color = "black"
+  ) +
+  theme_minimal() +
+  theme(
+  plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+  axis.title.x = element_text(size = 13),
+  axis.title.y = element_text(size = 13),
+  axis.text.x = element_text(size = 11),
+  axis.text.y = element_text(size = 11))
+
+```
+
+```{r mapa-viridis}
+
+ggplot(mapa_df, aes(long, lat, group = group, fill = Murder)) +
+  geom_polygon(color = "white") +
+  coord_fixed(1.3) +
+  scale_fill_gradientn(colors = rainbow(7), name = "Morderstwa\n(na 100 tys.)") +
+  labs(
+    title = "Wizualizacja B – Liczba morderstw w USA na 100 tys. mieszkańców",
+    x = "Długość geograficzna",
+    y = "Szerokość geograficzna"
+  ) +
+  geom_text(data = punkty, aes(x = long, y = lat, label = label),
+            inherit.aes = FALSE,
+            size = 6, fontface = "bold", color = "black") +
+  theme_minimal() +
+  theme(
+  plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+  axis.title.x = element_text(size = 13),
+  axis.title.y = element_text(size = 13),
+  axis.text.x = element_text(size = 11),
+  axis.text.y = element_text(size = 11))
+
+```
+
+---
+## Wyniki ankiety
+
+```{r wykres-ankiety}
+ankieta = data.frame(
+  mapa = rep(c("mapa A", "mapa B"), each = 2),
+  odp = rep(c("Tak", "Nie"), times = 2),
+  procent = c(26.7, 73.3, 60, 40) / 100)
+
+ggplot(ankieta, aes(x = odp, y = procent, fill = odp)) +
+  geom_col(width = 0.6) +
+  facet_wrap(~mapa) +
+  scale_y_continuous(labels = percent_format(), limits = c(0, 1)) +
+  labs(
+    title = "Czy mapy sugerują znaczące różnice w morderstwach między X i Y?",
+    x = "Odpowiedź",
+    y = "Udział odpowiedzi (%)",
+    fill = "Odpowiedź"
+  ) +
+  theme_minimal() +
+  theme(
+    panel.spacing = unit(2, "cm"),
+    strip.text = element_text(size = 14),
+    plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+    axis.title.x = element_text(size = 13),
+    axis.title.y = element_text(size = 13),
+    axis.text.x = element_text(size = 11),
+    axis.text.y = element_text(size = 11))
+
+
+
+```
+
+```{r tabela-ankiety-3-5}
+
+tabela = data.frame(
+  pytanie = c(
+    "3. Łatwość identyfikacji skrajnych wartości",
+    "4. Szybkość odczytu danych",
+    "5. Estetyka kolorystyki"
+  ),
+  `mapa A` = c("92,9%", "93,3%", "86,7%"),
+  `mapa B` = c("7,1%", "6,7%", "13,3%"))
+
+kable(tabela, format = "html", escape = FALSE, align = "lccc",
+      col.names = c("pytanie", "mapa A", "mapa B")) %>%
+  kable_styling(full_width = FALSE, position = 'center',
+                bootstrap_options = c("striped", "hover", "condensed"),
+                font_size = 14)
+
+```
+
+Wyniki ankiety są bardzo interesujące. Na wykresie widzimy, że większość użytkowników (ponad 70%) uznała, że mapa A nie sugeruje znaczących różnic w liczbie morderstw między stanami X i Y, podczas gdy w przypadku mapy B odpowiedzi były bardziej podzielone. Mimo to, aż 60% respondentów wskazało, że mapa B z tęczową skalą sugeruje nieistniejące różnice (przeskok barwy z czerwonej na pomarańczową). W rzeczywistości liczba morderstw na 100 tysięcy mieszkańców wynosi 0,8 w stanie X oraz 2,1 w stanie Y (przy wartościach mieszczących się w przedziale od 0,8 do 17,4), co oznacza, że to kolorystyka mapy A lepiej odwzorowuje rzeczywiste różnice.
+
+W trzech kolejnych pytaniach uczestnicy niemal jednogłośnie ocenili, że mapa A pozwala łatwiej zidentyfikować wartości skrajne, a także szybciej wyciągać wnioski. Dodatkowo jej estetyka została oceniona wyraźnie lepiej w porównaniu do mapy B.
+
+## Wnioski
+
+Dobór skali kolorystycznej ma istotny wpływ na interpretację danych. Uczestnicy znacznie częściej przypisywali nieistniejące różnice wizualizacji wykorzystującej skalę tęczową (mapa B). Skala monotoniczna (mapa A) o ograniczonym zakresie barw okazała się bardziej trafna i intuicyjna, zarówno pod względem poprawności interpretacji, jak i szybkości odczytu danych. Wyniki pokazują, że metoda opracowana wiele lat temu wciąż skutecznie sprawdza się wśród przeciętnych użytkowników.
