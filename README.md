@@ -210,21 +210,21 @@ Wstęp do eksploracji danych składa się z:
     <td>28.maj</td>
     <td>2</td>
     <td>projekt</td>
-    <td>P2: gotowe wykresy, prototyp wyglądu aplikacji</td>
+    <td><i>P2: gotowe wykresy, prototyp wyglądu aplikacji</i></td>
     <td>P2 (2p)</td>
   </tr>
   <tr>
     <td>03.cze</td>
     <td>2</td>
     <td>lab</td>
-    <td>Python: plotly</td>
+    <td><a href="https://github.com/kozaka93/2025L-ExploratoryDataAnalysis/tree/main/labs/lab14">Python: plotly</a></td>
     <td><a href="https://github.com/kozaka93/2025L-ExploratoryDataAnalysis/issues/352">PD6</a> (6p)</td>
   </tr>
   <tr>
     <td rowspan="2">04.cze</td>
     <td>1</td>
     <td>wykład</td>
-    <td>Test</td>
+    <td><i>Test</i></td>
     <td>Test (10p)</td>
   </tr>
   <tr>
