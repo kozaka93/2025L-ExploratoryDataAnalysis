@@ -1,0 +1,68 @@
+---
+title: "HW5"
+author: "Jan Wisniewski"
+date: "2025-05-13"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Opis eksperymentu
+
+Eksperyment polegał na porównaniu dwóch różnych form wizualizacji danych dotyczących liczby ludności poszczególnych kontynentów. Uczestnikom ankiety zaprezentowano dwie wersje wykresu, obie oparte na tych samych danych: wykres słupkowy w jednolitym kolorze oraz wykres kołowy z wykorzystaniem stonowanej palety kolorów. Każdy z 16 respondentów zobaczył obie wizualizacje i został poproszony jedynie o wskazanie, którą z nich uznaje za bardziej czytelną, łatwiejszą do interpretacji oraz dokładniej przedstawiającą proporcje między kontynentami. Celem eksperymentu było zbadanie, która forma — słupkowa czy kołowa — jest przez uczestników postrzegana jako lepsza do odczytu udziałów poszczególnych kategorii.
+
+
+```{r}
+df <- data.frame(
+  kontynent = c("Azja", "Afryka", "Europa", "Ameryka Pn.", "Ameryka Pd.", "Australia"),
+  ludnosc = c(4.7, 1.4, 0.78, 0.62, 0.43, 0.04)
+)
+```
+## Wykres kołowy
+
+```{r}
+library(ggplot2)
+ggplot(df, aes(x = "", y = ludnosc, fill = kontynent)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar("y") +
+  scale_fill_brewer(palette = 'Blues') +
+  labs(title = "Ludność na kontynentach (w mld)") +
+  theme_void()+
+  theme(
+    plot.title = element_text(hjust = 0.5)
+  )
+  
+```
+## Wykres słupkowy
+```{r}
+
+df$kontynent <- factor(df$kontynent, levels = df$kontynent)
+
+
+ggplot(df, aes(x = kontynent, y = ludnosc)) +
+  geom_bar(stat = "identity", width = 0.6, fill="skyblue") +  
+  labs(
+    title = "Ludność na kontynentach (w mld)",
+    x = "Kontynent",
+    y = "Ludność"
+  ) +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, max(df$ludnosc) + 0.5)) +  
+  theme_minimal() +  
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "none",
+    plot.title = element_text(hjust = 0.5)
+  )
+
+```
+
+## Wyniki eksperymentu
+
+Spośród 16 zebranych odpowiedzi aż 10 osób (62,5 %) wskazało wykres słupkowy jako bardziej czytelny, natomiast 6 osób (37,5 %) wybrało wykres kołowy. Głównymi powodami przy wyborze wykresu słupkowego mogła być prostota, czytelność i możliwość łatwego porównania liczby mieszkańców każdego kontynentu
+
+
+## Podsumowanie
+
+Celem eksperymentu było zweryfikowanie, czy zalecane w literaturze „dobre praktyki” – przede wszystkim czytelność wykresów słupkowych oraz ograniczenia kołowych – znajdują odzwierciedlenie w odbiorze współczesnych użytkowników. Wyniki pokazują wyraźną, choć nie bezwzględną, przewagę słupków: większość respondentów uznała je za bardziej przejrzyste i precyzyjne. Jednocześnie ponad jedna trzecia uczestników wskazała wykres kołowy jako lepszy do szybkiego oszacowania udziałów, podkreślając jego atrakcyjny charakter wizualny. To sugeruje, że choć praktyki rekomendujące wykresy słupkowe mają silne uzasadnienie i trafiają do większości użytkowników, część osób nadal ceni pokazywanie proporcji w formie koła. W projekcie wizualizacji warto więc brać pod uwagę nie tylko obiektywne kryteria „czytelności”, ale też preferencje i przyzwyczajenia odbiorców.
