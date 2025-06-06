@@ -230,21 +230,21 @@ Wstęp do eksploracji danych składa się z:
   <tr>
     <td>1</td>
     <td>projekt</td>
-    <td>Konsultacje</td>
+    <td><i>Konsultacje</i></td>
     <td></td>
   </tr>
   <tr>
     <td>10.cze</td>
     <td>2</td>
     <td>lab</td>
-    <td>Python: EDA</td>
+    <td><a href="https://github.com/kozaka93/2025L-ExploratoryDataAnalysis/tree/main/labs/lab15">Python: EDA</a></td>
     <td></td>
   </tr>
   <tr>
     <td rowspan="2">11.cze</td>
     <td>1</td>
     <td>wykład</td>
-    <td rowspan="2">Oddanie P2</td>
+    <td rowspan="2"><i>Oddanie P2</i></td>
     <td rowspan="2">P2 (15p)</td>
   </tr>
   <tr>
