@@ -1,0 +1,35 @@
+---
+title: "Pojedynek ras psów"
+output: html_document
+date: "2025-06-10"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Pojedynek ras psów
+
+Aplikacja Shiny porównująca cechy dwóch wybranych ras psów na podstawie danych z pliku `dogs_top_breeds_2`.
+
+## Wymagania
+
+- R (>= 4.0)
+- Pakiety: `shiny`, `ggplot2`, `dplyr`, `tidyr`, `leaflet`, `bslib`, `tibble`, `plotly`, `stringr`, `lubridate`,
+           `countrycode`, `rnaturalearthdata`, `rnaturalearth`, `bsicons`, `bslib`
+
+## Funkcje
+
+- Porównanie dwóch wybranych ras psów na wykresie słupkowym
+- Mapka z pochodzeniem ras
+- Analiza czynników wpływających na długość pobytu psa w schronisku
+
+## Autorki
+
+Wiktoria Grodzka, Katarzyna Łabuś, Oliwia Strzechowska
+
+
+
+
+
+
+
