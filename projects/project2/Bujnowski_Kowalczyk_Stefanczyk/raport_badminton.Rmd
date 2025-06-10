@@ -1,0 +1,37 @@
+---
+title: "Projekt Badminton"
+author: "Mateusz Bujnowski, Filip Kowalczyk, Paweł Stefańczyk"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Cel projektu
+
+Celem projektu było przygotowanie i zilustrowanie danych dotyczących tematu badmintona. Interaktywną wizualizacje należało zamieścić w aplikacji. W ramach projektu udało się zawrzeć takie informacje jak liczba sędziów i zawodników polskich wraz z podziałem na województwa, liczba zawodników startujących na olimpiadzie z całego świata oraz tendencję wygrywania olimpiady przez dane państwa.
+
+## Wyniki
+
+W pierwszej zakładce zostały przedstawione dane na temat aktualnych, zawodowych graczy badmintona. Dzięki interaktywnej mapie jesteśmy w stanie zobaczyć liczbę zawodników z każdego województwa. Ponadto można sprawdzić różne informacje na temat polskich sędziów z tej dyscypliny sportu.
+
+![](C:/Users/Paawel/Desktop/projektRaplikacja/polska_mapa.png)
+![](C:/Users/Paawel/Desktop/projektRaplikacja/m1.png)
+![](C:/Users/Paawel/Desktop/projektRaplikacja/m2.png)
+![](C:/Users/Paawel/Desktop/projektRaplikacja/m3.png)
+![](C:/Users/Paawel/Desktop/projektRaplikacja/m4.png)
+![](C:/Users/Paawel/Desktop/projektRaplikacja/m5.png)
+
+
+Poniżej znajduje się mapa świata ilustrująca liczbę zawodników olimpijskich z danego kraju w wybranym przedziale czasowym.Ponadto widoczny jest wykres przedstawiający rozkład wzrostu zawodników z różnych krajów wraz z podziałem na płcie.
+
+![](C:/Users/Paawel/Desktop/projektRaplikacja/mapa_rozklad.png)
+![](C:/Users/Paawel/Desktop/projektRaplikacja/m7.png)
+
+W zakładce "Wyniki Olimpiad" można znaleźć informacje o zwycięzcach olimpiady w różnych konkurencjach w danym roku. Dodatkowo jest możliwość przeanalizowania zmiany liczby zawodników na przestrzeni lat w danej drużynie.
+
+![](C:/Users/Paawel/Desktop/projektRaplikacja/m6.png)
+![](C:/Users/Paawel/Desktop/projektRaplikacja/flagi.png)
+
+
