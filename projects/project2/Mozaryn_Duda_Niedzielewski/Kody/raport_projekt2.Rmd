@@ -1,0 +1,93 @@
+---
+title: "README"
+author: "Pawel_Mozaryn, Misia Duda & Maciej Niedzielewski "
+date: "2025-06-07"
+output: html_document
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+# EDA przepisów ze strony *Allrecipes.com*
+
+## Źródło i sposób zebrania danych
+
+Dane zostały zebrane metodą *webscrapingu* z amerykańskiej strony
+kulinarnej www.allrecipes.com Zescrapowane zostało **15000** przepisów,
+które następnie zostały zebrane w jednej ramce danych formatu csv. Ramka
+danych była następnie obrabiana w pakiecie **R**.
+
+## Co znajduje się w interaktywnym raporcie?
+
+### **Wykres 1**. Kalorie vs czas przygotowania wg kuchni.
+
+```{r, echo=FALSE, out.width="600px"}
+knitr::include_graphics("/Users/pawelmozaryn/Desktop/Mozaryn_Duda_Niedzielewski/screenshots/s1.png")
+
+```
+
+Wykres przedstawia średni czas przygotowania oraz średnie kalorie dań
+najpopularniejszych ośmiu kuchni, w formie kropek na układzie
+współrzędnych. Rozmiar kropki jest proporcjonalny do *współczynnika
+kalorii przygotowywanych na minutę*, powstałego poprzez podzielenie
+współrzędnej x-owej przez y-kową
+
+### Wnioski
+
+Kuchnia indyjska jest średnio najbardziej czasochłonna, ale też najmniej
+kaloryczna - być może to dobry wybów dla otyłych pasjonatów gotowania.
+Dla tych, którzy nie martwią się o kalorie oraz mają w zanadrzu 37 minut
+wolnego czasu polecana jest kuchnia włoska
+
+### **Wykres 2** Wartości odżywcze - top 10 dań.
+
+```{r, echo=FALSE, out.width="600px"}
+knitr::include_graphics("/Users/pawelmozaryn/Desktop/Mozaryn_Duda_Niedzielewski/screenshots/s2.png")
+
+```
+
+Wykres przedstawia wartości odżywcze najpopularniejszych 10 dań ze
+strony. Rozważane są wapń, choresterol, błonnik, żelazo, potas oraz sód.
+Zawartość w jednej realizacji przepisu wyrażone w gramach.
+
+### Wnioski
+
+Dla wielbicieli potasu polecane są **Vegan Potato Soy Chorizo Tacos**,
+aż *100 gramów* na realizację przepisu!
+
+### **Wykres 3** Makroskładniki według kuchni
+
+```{r, echo=FALSE, out.width="600px"}
+knitr::include_graphics("/Users/pawelmozaryn/Desktop/Mozaryn_Duda_Niedzielewski/screenshots/s3.png")
+
+```
+
+Po prawej stronie każdej z kuchni rozmieszczonych na osi OY mamy trzy
+poziome słupki ilustrujące średnią ilość białka tłuszczy i węgli w
+daniach tych kuchni. \### Wnioski Co ciekawe, to kuchnia francuska, a
+nie włoska jest najbogatsza w węglowodane. Włoskie przepisy są za to
+najbogatsze w białko!
+
+### **Wykres 4** Rozkład zmiennych numerycznych najlepszych przepisów wg kuchni
+
+```{r, echo=FALSE, out.width="600px"}
+knitr::include_graphics("/Users/pawelmozaryn/Desktop/Mozaryn_Duda_Niedzielewski/screenshots/s4.png")
+
+```
+
+Możemy rozważane jest wybrane przez nas x% najlepiej ocenianych
+przepisów w 3 wybranych przez nas kuchniach. Pod lupę bierzemy rozkład
+kalorii, czasu przygotowania dania lub całkowitego czsu gotowania.
+Rozkład ten zilustrowany jest jako wykres pudełkowy
+
+### **Wykres (a wlasciwie rysunek) 5**
+
+```{r, echo=FALSE, out.width="600px"}
+knitr::include_graphics("/Users/pawelmozaryn/Desktop/Mozaryn_Duda_Niedzielewski/screenshots/s5.png")
+
+```
+
+Jakie słowa dominują w przepisach różnych kuchni? Wybieramy kuchnię, a
+następnie pokazuje się nam przpiękna chmura słów. Słowa najczęściej się
+pojawiające są największe. Oczywiście nie rozważamy słów pełniących
+jedynie rolę językową tj "oraz", "lub".
