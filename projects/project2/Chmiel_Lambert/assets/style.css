@@ -1,0 +1,215 @@
+/* ----------------------------------------------
+   Import czcionki Inter z Google Fonts
+   ---------------------------------------------- */
+   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+   /* ----------------------------------------------
+      Całe body aplikacji – ciemne tło i jasny tekst
+      ---------------------------------------------- */
+   body {
+     margin: 0;
+     padding: 0;
+     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+     background-color: #1E1E2F !important;
+     color: #F8F8F2 !important;
+   }
+   
+   /* ----------------------------------------------
+      Kontener, w którym wyświetlane są zakładki
+      ---------------------------------------------- */
+   #tabs-content {
+     background-color: #1E1E2F !important;
+     color: #F8F8F2 !important;
+   }
+   
+   /* ----------------------------------------------
+      Styl nagłówka H1
+      ---------------------------------------------- */
+   h1 {
+     font-family: 'Inter', sans-serif !important;
+     color: #F8F8F2 !important;
+     margin-bottom: 20px !important;
+   }
+   
+   /* ----------------------------------------------
+      Styl zakładek (Tabs) - nadpisanie reguł o niskiej specyfice
+      ---------------------------------------------- */
+   /* Bardzo specyficzne selektory oparte na id="tabs" */
+   html body #tabs div[role="tablist"] > button[role="tab"] {
+     background-color: #2E2E40 !important;
+     color: #F8F8F2 !important;
+     border: none !important;
+     font-family: 'Inter', sans-serif !important;
+     margin-right: 4px !important;
+     padding: 6px 12px !important;
+     border-radius: 4px 4px 0 0 !important;
+   }
+   
+   html body #tabs div[role="tablist"] > button[role="tab"][aria-selected="true"] {
+     background-color: #44475A !important;
+     color: #F8F8F2 !important;
+     font-weight: 500 !important;
+   }
+   
+   /* Usuń linię pod tablist, jeśli istnieje */
+   html body #tabs div[role="tablist"] {
+     border-bottom: none !important;
+   }
+   
+   /* ----------------------------------------------
+      Specyficzne nadpisanie dla klasy generowanej .tab.jsx-1653633250
+      (jeśli ta klasa występuje w elementach zakładek)
+      ---------------------------------------------- */
+   button.tab.jsx-1653633250[role="tab"] {
+     background-color: #2E2E40 !important;
+     color: #F8F8F2 !important;
+     border: none !important;
+     font-family: 'Inter', sans-serif !important;
+     margin-right: 4px !important;
+     padding: 6px 12px !important;
+     border-radius: 4px 4px 0 0 !important;
+   }
+   
+   button.tab.jsx-1653633250[role="tab"][aria-selected="true"] {
+     background-color: #44475A !important;
+     color: #F8F8F2 !important;
+     font-weight: 500 !important;
+   }
+   
+   /* ----------------------------------------------
+      Wykresy (dcc.Graph) – tło przezroczyste
+      ---------------------------------------------- */
+   .dash-graph {
+     background-color: transparent !important;
+   }
+   
+   /* ----------------------------------------------
+      Dropdown i jego elementy – jasny tekst na jasnym tle w kontrolce
+      ---------------------------------------------- */
+   div[class*="Dropdown"] .Select-control,
+   .dash-dropdown .Select-control {
+     background-color: #E6E6E6 !important;
+     border: 1px solid #44475A !important;
+     border-radius: 4px !important;
+     color: #000 !important;
+     font-family: 'Inter', sans-serif !important;
+   }
+   
+   div[class*="Dropdown"] .Select-placeholder,
+   .dash-dropdown .Select-placeholder {
+     color: #000 !important;
+   }
+   
+   div[class*="Dropdown"] .Select-menu-outer,
+   .dash-dropdown .Select-menu-outer {
+     background-color: #E6E6E6 !important;
+     color: #000 !important;
+   }
+   
+   div[class*="Dropdown"] .VirtualizedSelectOption,
+   .dash-dropdown .VirtualizedSelectOption {
+     background-color: #E6E6E6 !important;
+     color: #000 !important;
+   }
+   
+   div[class*="Dropdown"] .VirtualizedSelectOption.is-focused,
+   .dash-dropdown .VirtualizedSelectOption.is-focused {
+     background-color: #44475A !important;
+     color: #F8F8F2 !important;
+   }
+   
+   /* ----------------------------------------------
+      RadioItems – opcje poziomo (kontener jako flex)
+      ---------------------------------------------- */
+   div[class*="RadioItems"] {
+     display: flex !important;
+     flex-wrap: wrap !important;
+     gap: 8px !important;
+   }
+   
+   div[class*="RadioItems"] input[type="radio"] {
+     appearance: none !important;
+     width: 14px !important;
+     height: 14px !important;
+     border: 2px solid #44475A !important;
+     border-radius: 50% !important;
+     margin-right: 4px !important;
+     position: relative !important;
+   }
+   
+   div[class*="RadioItems"] input[type="radio"]:checked::before {
+     content: '' !important;
+     position: absolute !important;
+     top: 2px !important;
+     left: 2px !important;
+     width: 6px !important;
+     height: 6px !important;
+     background-color: #44475A !important;
+     border-radius: 50% !important;
+   }
+   
+   div[class*="RadioItems"] label {
+     display: flex !important;
+     align-items: center !important;
+     background-color: #E6E6E6 !important;
+     color: #000 !important;
+     padding: 2px 8px !important;
+     border-radius: 4px !important;
+     font-family: 'Inter', sans-serif !important;
+     cursor: pointer !important;
+   }
+   
+   div[class*="RadioItems"] input[type="radio"]:checked + label {
+     background-color: #44475A !important;
+     color: #F8F8F2 !important;
+   }
+   
+   /* ----------------------------------------------
+      Labelki – jasny kolor
+      ---------------------------------------------- */
+   label {
+     color: #F8F8F2 !important;
+     font-family: 'Inter', sans-serif !important;
+     margin-bottom: 5px !important;
+   }
+   
+   /* ----------------------------------------------
+      Usuń outline focusowanych elementów
+      ---------------------------------------------- */
+   :focus {
+     outline: none !important;
+   }
+   
+   /* ----------------------------------------------
+      Układ i wygląd kontrolek sterujących
+      ---------------------------------------------- */
+   .control-row {
+     display: flex !important;
+     flex-wrap: wrap !important;
+     gap: 12px !important;
+     justify-content: center !important;
+     margin: 10px 0 !important;
+   }
+   
+   .control-row .control {
+     flex: 0 1 180px !important;
+     display: flex !important;
+     flex-direction: column !important;
+   }
+   
+   /* ----------------------------------------------
+      Style przycisków <button>
+      ---------------------------------------------- */
+   button {
+     font-family: 'Inter', sans-serif !important;
+     background-color: #0b23c1 !important;
+     color: #F8F8F2 !important;
+     border: none !important;
+     border-radius: 4px !important;
+     padding: 4px 10px !important;
+     cursor: pointer !important;
+   }
+   
+   button:hover {
+     background-color: #6272A4 !important;
+   }
